@@ -170,6 +170,35 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
         self.assertTrue(err)
 
+    def test_poller_is_called_on_recv(self):
+        # prepare
+        a = Api(self.log, self.listeners)
+        e = self.mox.CreateMock(Event)
+        e.processed = True
+        def side_effect(a, b):
+            e.return_value = b
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect).AndReturn(e)
+
+        p = self.mox.CreateMockAnything()
+        p(mox.IsA(list))
+        
+        self.mox.ReplayAll()
+
+        # test
+        err = False
+        a.attach_poller(p)
+        try:
+            a.recv('a', 'b', 'c')
+        except TypeError:
+            err = True
+
+        # verify
+        self.mox.VerifyAll()
+        self.assertFalse(err)
+
+
 
 if "__main__" == __name__:
     unittest.main()
