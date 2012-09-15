@@ -33,8 +33,7 @@ class Api(object):
         """
         self.log.debug('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
-        tmp = {'id': str(uuid.uuid4()), 'data': self._prepare_data(message, \
-            user, args)}
+        tmp = self._prepare_data(message, user, args)
         self.cache.append(tmp)
         self._notify(tmp)
 
@@ -46,7 +45,12 @@ class Api(object):
         e = self.listeners.notify_until(Event(self, 'auth.check', user))
         if not e.processed:
             raise AuthError()
-        return {'message': message, 'user': user, 'args': args}
+        # filter message and prepare final message structure
+        e = self.listeners.notify(\
+            Event(self, 'message.written'), \
+            {'id': str(uuid.uuid4()), 'data': {\
+                'message': message, 'from': user, 'args': args}})
+        return e.return_value
 
     def _notify(self, data):
         """
