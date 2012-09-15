@@ -12,6 +12,9 @@ import logging
 import _path
 _path.fix()
 
+# event modules
+from event import Dispatcher, Event
+
 ##
 # campfire api modules
 #
@@ -23,9 +26,11 @@ class ApiTestCase(unittest.TestCase):
     def setUp(self):
         logging.basicConfig()
         self.log = logging.getLogger()
+        self.mox = mox.Mox()
+        self.listeners = self.mox.CreateMock(Dispatcher)
 
     def tearDown(self):
-        pass
+        self.mox.UnsetStubs()
 
     def test_init_require_2_args(self):
         err = False
@@ -102,6 +107,67 @@ class ApiTestCase(unittest.TestCase):
         except:
             err = True
         self.assertFalse(err)
+
+    def test_attach_poller_requires_2_args(self):
+        a = Api(self.log, None)
+        err = False
+        try:
+            a.attach_poller()
+        except TypeError:
+            err = True
+        self.assertTrue(err)
+
+    def test_attach_poller_requires_2_args_1(self):
+        a = Api(self.log, None)
+        err = False
+        try:
+            a.attach_poller(None)
+        except TypeError:
+            err = True
+        self.assertTrue(err)
+
+    def test_attach_poller_requires_2_args_1(self):
+        a = Api(self.log, None)
+        poller = 'abc'
+        err = False
+        try:
+            a.attach_poller(poller, None)
+        except TypeError:
+            err = True
+        self.assertFalse(err)
+        self.assertTrue(poller in a.pollers)
+
+    def test_attach_does_not_check_callback_type(self):
+        err = False
+        a = Api(self.log, None)
+        try:
+            a.attach_poller('abc')
+        except:
+            err = True
+        self.assertFalse(err)
+
+    def test_poller_mus_by_callable(self):
+        # prepare
+        a = Api(self.log, self.listeners)
+        e = self.mox.CreateMock(Event)
+        e.processed = True
+        def side_effect(a, b):
+            e.return_value = b
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect).AndReturn(e)
+        self.mox.ReplayAll()
+
+        # test
+        a.attach_poller('a')
+        try:
+            a.recv('a', 'b', 'c')
+        except TypeError:
+            err = True
+
+        # verify
+        self.mox.VerifyAll()
+        self.assertTrue(err)
 
 
 if "__main__" == __name__:
