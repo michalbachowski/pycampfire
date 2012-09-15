@@ -22,6 +22,8 @@ class Api(object):
         self.cache = deque([], cache_size)
         self.pollers = []
 
+        self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
+
     def recv(self, message, user, args):
         self.log.info('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
