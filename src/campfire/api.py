@@ -46,16 +46,23 @@ class Api(object):
             self._respond([data], callback)
         self.pollers = []
 
-    def poll(self, cursor, callback):
+    def attach_poller(self, cursor, callback):
         """
-        Adds callback to being notified about new value of
-        current performance for given section and metric
+        Adds callback to being notified about new message
         """
         tmp = self._fetch_cached_messages(cursor)
         if tmp:
             self._respond(tmp, callback)
             return
         self.pollers.append(callback)
+        return self
+
+    def detach_poller(self):
+        try:
+            self.pollers.remove(callback)
+        except ValueError:
+            pass
+        return self
 
     def _fetch_cached_messages(self, cursor=None):
         """
