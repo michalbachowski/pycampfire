@@ -10,6 +10,9 @@ class Api(object):
     """
 
     def __init__(self, log, listeners, cache_size=120):
+        """
+        Instance initialization
+        """
         ##
         # input args
         #
@@ -25,7 +28,10 @@ class Api(object):
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
 
     def recv(self, message, user, args):
-        self.log.info('msg=received message; message=%s; user=%s; args=%s', \
+        """
+        Entry point for new massages
+        """
+        self.log.debug('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
         tmp = {'id': str(uuid.uuid4()), 'data': self._prepare_data(message, \
             user, args)}
@@ -33,6 +39,10 @@ class Api(object):
         self._notify(tmp)
 
     def _prepare_data(self, message, user, args):
+        """
+        Prepares message data
+        """
+        # authenticate message author
         e = self.listeners.notify_until(Event(self, 'auth.check', user))
         if not e.processed:
             raise AuthError()
@@ -54,7 +64,7 @@ class Api(object):
 
     def attach_poller(self, cursor, callback):
         """
-        Adds callback to being notified about new message
+        Attaches poller to list of pollers waiting for message
         """
         tmp = self._fetch_cached_messages(cursor)
         if tmp:
@@ -64,6 +74,9 @@ class Api(object):
         return self
 
     def detach_poller(self):
+        """
+        Detaches given poller from list of polles waiting for new messages
+        """
         try:
             self.pollers.remove(callback)
         except ValueError:
