@@ -68,7 +68,7 @@ class Api(object):
         """
         callback(message)
 
-    def attach_poller(self, cursor, callback):
+    def attach_poller(self, callback, cursor=None):
         """
         Attaches poller to list of pollers waiting for message
         """
