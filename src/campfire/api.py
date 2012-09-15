@@ -46,6 +46,12 @@ class Api(object):
             self._respond([data], callback)
         self.pollers = []
 
+    def _respond(self, message, callback):
+        """
+        Sends response to given callback about new messages
+        """
+        callback(message)
+
     def attach_poller(self, cursor, callback):
         """
         Adds callback to being notified about new message
@@ -83,9 +89,3 @@ class Api(object):
             if self.cache[i]['id'] == cursor:
                 return i + 1
         return (self.cache_size, 0)[int(cursor is None)]
-
-    def _respond(self, message, callback):
-        """
-        Sends response to given callback about new performance values
-        """
-        callback(message)
