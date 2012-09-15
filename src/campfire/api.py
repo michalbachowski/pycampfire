@@ -4,6 +4,7 @@ import uuid
 from itertools import takewhile
 from collections import deque
 from functools import partial
+from event import Event
 
 
 class Api(object):
