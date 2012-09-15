@@ -160,6 +160,7 @@ class ApiTestCase(unittest.TestCase):
 
         # test
         a.attach_poller('a')
+        err = False
         try:
             a.recv('a', 'b', 'c')
         except TypeError:
