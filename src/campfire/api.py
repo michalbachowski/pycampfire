@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import uuid
+from itertools import takewhile
 from collections import deque
+from functools import partial
 
 
 class Api(object):
@@ -22,7 +24,7 @@ class Api(object):
         ##
         # some important values
         #
-        self.cache = deque([], cache_size)
+        self._cache = deque([], cache_size)
         self.pollers = []
 
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
@@ -34,7 +36,7 @@ class Api(object):
         self.log.debug('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
         tmp = self._prepare_data(message, user, args)
-        self.cache.append(tmp)
+        self._cache.appendLeft(tmp)
         self._notify(tmp)
 
     def _prepare_data(self, message, user, args):
@@ -91,18 +93,11 @@ class Api(object):
         """
         Fetches cached messages beginning from given cursor
         """
-        try:
-            return self.cache[\
-                self._find_index_of_last_value(cursor):]
-        except KeyError:
-            return []
+        return [i for i in takewhile(partial(self._compare_index, cursor), \
+            self._cache)]
 
-    def _find_index_of_last_value(self, cursor=None):
+    def _compare_index(self, cursor, item):
         """
-        Finds index of messages newer than given cursor
+        Compares cursor with index of given message
         """
-        cache_len = len(self.cache)
-        for i in xrange(cache_len - 1, -1, -1):
-            if self.cache[i]['id'] == cursor:
-                return i + 1
-        return (self.cache_size, 0)[int(cursor is None)]
+        return cursor == item['id']
