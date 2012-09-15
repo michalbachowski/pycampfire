@@ -1,3 +1,0 @@
-[submodule "src/event"]
-	path = src/event
-	url = https://github.com/michalbachowski/event.py.git
