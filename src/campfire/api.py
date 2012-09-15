@@ -72,7 +72,7 @@ class Api(object):
 
     def _fetch_cached_messages(self, cursor=None):
         """
-        Fetches cached performance values beginning from given cursor
+        Fetches cached messages beginning from given cursor
         """
         try:
             return self.cache[\
@@ -82,7 +82,7 @@ class Api(object):
 
     def _find_index_of_last_value(self, cursor=None):
         """
-        Finds index of performance values newer than given cursor
+        Finds index of messages newer than given cursor
         """
         cache_len = len(self.cache)
         for i in xrange(cache_len - 1, -1, -1):
