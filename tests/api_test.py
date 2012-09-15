@@ -146,7 +146,7 @@ class ApiTestCase(unittest.TestCase):
             err = True
         self.assertFalse(err)
 
-    def test_poller_mus_by_callable(self):
+    def test_poller_must_by_callable(self):
         # prepare
         a = Api(self.log, self.listeners)
         e = self.mox.CreateMock(Event)
