@@ -37,7 +37,7 @@ class Api(object):
         self.log.debug('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
         tmp = self._prepare_data(message, user, args)
-        self._cache.appendLeft(tmp)
+        self._cache.appendleft(tmp)
         self._notify(tmp)
 
     def _prepare_data(self, message, user, args):
