@@ -49,7 +49,7 @@ class Api(object):
         if not e.processed:
             raise AuthError()
         # filter message and prepare final message structure
-        e = self.listeners.notify(\
+        e = self.listeners.filter(\
             Event(self, 'message.written'), \
             {'id': str(uuid.uuid4()), 'data': {\
                 'message': message, 'from': user, 'args': args}})
