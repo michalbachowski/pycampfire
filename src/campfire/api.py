@@ -9,7 +9,7 @@ class Api(object):
     Api class that provides two main methods:
     """
 
-    def __init__(self, log, listeners):
+    def __init__(self, log, listeners, cache_size=120):
         ##
         # input args
         #
@@ -19,7 +19,7 @@ class Api(object):
         ##
         # some important values
         #
-        self.cache = deque([], 20)
+        self.cache = deque([], cache_size)
         self.pollers = []
 
     def recv(self, message, user, args):
