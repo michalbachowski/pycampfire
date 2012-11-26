@@ -40,19 +40,25 @@ class Api(object):
         self._cache.appendleft(tmp)
         self._notify(tmp)
 
+    def _auth_user(self, user):
+        """
+        Checks authentication for given user
+        """
+        e = self.dispatcher.notify_until(Event(self, 'auth.check', user))
+        if not e.processed:
+            raise AuthError()
+        return e.return_value
+
     def _prepare_data(self, message, user, args):
         """
         Prepares message data
         """
-        # authenticate message author
-        e = self.dispatcher.notify_until(Event(self, 'auth.check', user))
-        if not e.processed:
-            raise AuthError()
         # filter message and prepare final message structure
         e = self.dispatcher.filter(\
             Event(self, 'message.written'), \
             {'id': str(uuid.uuid4()), 'data': {\
-                'message': message, 'from': user, 'args': args}})
+                'message': message, 'from': self._auth_user(user), \
+                    'args': args}})
         return e.return_value
 
     def _notify(self, data):
