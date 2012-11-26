@@ -93,11 +93,11 @@ class Api(object):
         """
         callback(message)
 
-    def attach_poller(self, callback, cursor=None):
+    def attach_poller(self, user, callback, cursor=None):
         """
         Attaches poller to list of pollers waiting for message
         """
-        tmp = self._fetch_cached_messages(cursor)
+        tmp = self._fetch_cached_messages(user, cursor)
         if tmp:
             self._respond(tmp, callback)
             return
@@ -114,12 +114,13 @@ class Api(object):
             pass
         return self
 
-    def _fetch_cached_messages(self, cursor=None):
+    def _fetch_cached_messages(self, user, cursor=None):
         """
         Fetches cached messages beginning from given cursor
         """
-        return [i for i in takewhile(partial(self._compare_index, cursor), \
-            self._cache)]
+        return map(lambda a: a is not None, [self._prepare_output(user, i) \
+            for i in takewhile(partial(self._compare_index, cursor), \
+                self._cache)])
 
     def _compare_index(self, cursor, item):
         """
