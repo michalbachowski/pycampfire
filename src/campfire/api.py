@@ -83,8 +83,8 @@ class Api(object):
         """
         Sends response to all pollers
         """
-        for callback in self.pollers:
-            self._respond([data], callback)
+        for (callback, user) in self.pollers:
+            self._respond([self._filter_output(user, data)], callback)
         self.pollers = []
 
     def _respond(self, message, callback):
@@ -101,15 +101,15 @@ class Api(object):
         if tmp:
             self._respond(tmp, callback)
             return
-        self.pollers.append(callback)
+        self.pollers.append((callback, user))
         return self
 
-    def detach_poller(self):
+    def detach_poller(self, callback):
         """
         Detaches given poller from list of polles waiting for new messages
         """
         try:
-            self.pollers.remove(callback)
+            map(l.remove, (s for s in l if s[0] == callback))
         except ValueError:
             pass
         return self
