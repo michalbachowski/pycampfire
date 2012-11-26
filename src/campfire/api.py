@@ -5,6 +5,7 @@ from itertools import takewhile
 from collections import deque
 from functools import partial
 from event import Event
+from copy import deepcopy
 
 
 class Api(object):
@@ -59,6 +60,23 @@ class Api(object):
             {'id': str(uuid.uuid4()), 'data': {\
                 'message': message, 'from': self._auth_user(user), \
                     'args': args}})
+        return e.return_value
+
+    def _filter_output(self, user, message):
+        """
+        Filters messages before the will be send to user
+        """
+        # filter message
+        msg = self.dispatcher.filter(\
+            Event(self, 'message.read.filter', {'user': user}), \
+            deepcopy(message)).return_value
+        # prevent from returning message to user,
+        # that should not read it
+        e = self.dispatcher.notifyUntil(\
+            Event(self, 'message.read.prevent', {'user': user}), \
+            deepcopy(message))
+        if e.processed:
+            return None
         return e.return_value
 
     def _notify(self, data):
