@@ -12,7 +12,7 @@ class Api(object):
     Api class that provides two main methods:
     """
 
-    def __init__(self, log, listeners, cache_size=120):
+    def __init__(self, log, dispatcher, cache_size=120):
         """
         Instance initialization
         """
@@ -20,7 +20,7 @@ class Api(object):
         # input args
         #
         self.log = log
-        self.listeners = listeners
+        self.dispatcher = dispatcher
 
         ##
         # some important values
@@ -45,11 +45,11 @@ class Api(object):
         Prepares message data
         """
         # authenticate message author
-        e = self.listeners.notify_until(Event(self, 'auth.check', user))
+        e = self.dispatcher.notify_until(Event(self, 'auth.check', user))
         if not e.processed:
             raise AuthError()
         # filter message and prepare final message structure
-        e = self.listeners.filter(\
+        e = self.dispatcher.filter(\
             Event(self, 'message.written'), \
             {'id': str(uuid.uuid4()), 'data': {\
                 'message': message, 'from': user, 'args': args}})
