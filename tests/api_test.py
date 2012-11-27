@@ -171,7 +171,7 @@ class ApiTestCase(unittest.TestCase):
             side_effect).AndReturn(e)
         # called when notifying pollers
         e2 = self.mox.CreateMock(Event)
-        e2.processed = True
+        e2.processed = False
         e2.return_value = None
         def side_effect2(a, b):
             e2.return_value = b
@@ -207,7 +207,7 @@ class ApiTestCase(unittest.TestCase):
             side_effect).AndReturn(e)
         # called when notifying pollers
         e2 = self.mox.CreateMock(Event)
-        e2.processed = True
+        e2.processed = False
         e2.return_value = None
         def side_effect2(a, b):
             e2.return_value = b
