@@ -5,7 +5,7 @@ from itertools import takewhile
 from collections import deque
 from functools import partial
 from event import Event
-from copy import deepcopy
+import copy
 
 
 class Api(object):
@@ -69,12 +69,12 @@ class Api(object):
         # filter message
         msg = self.dispatcher.filter(\
             Event(self, 'message.read.filter', {'user': user}), \
-            deepcopy(message)).return_value
+            copy.deepcopy(message)).return_value
         # prevent from returning message to user,
         # that should not read it
         e = self.dispatcher.notify_until(\
             Event(self, 'message.read.prevent', {'user': user, \
-                'message': deepcopy(message)}))
+                'message': copy.deepcopy(message)}))
         if e.processed:
             return None
         return e.return_value
@@ -83,9 +83,16 @@ class Api(object):
         """
         Sends response to all pollers
         """
-        for (callback, user) in self.pollers:
-            self._respond([self._filter_output(user, data)], callback)
+        pollers = copy.copy(self.pollers)
         self.pollers = []
+        for (callback, user) in pollers:
+            tmp = self._filter_output(user, data)
+            # prevent from forgetting connection when message should be not send
+            if tmp is None:
+                self.pollers.append((callback, users))
+            # send message
+            else:
+                self._respond([tmp], callback)
 
     def _respond(self, message, callback):
         """
