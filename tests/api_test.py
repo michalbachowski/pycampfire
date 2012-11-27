@@ -108,7 +108,7 @@ class ApiTestCase(unittest.TestCase):
             err = True
         self.assertFalse(err)
 
-    def test_attach_poller_requires_2_args(self):
+    def test_attach_poller_requires_3_args(self):
         a = Api(self.log, None)
         err = False
         try:
@@ -117,7 +117,7 @@ class ApiTestCase(unittest.TestCase):
             err = True
         self.assertTrue(err)
 
-    def test_attach_poller_requires_2_args_1(self):
+    def test_attach_poller_requires_3_args_1(self):
         a = Api(self.log, None)
         err = False
         try:
@@ -126,22 +126,33 @@ class ApiTestCase(unittest.TestCase):
             err = True
         self.assertTrue(err)
 
-    def test_attach_poller_requires_2_args_1(self):
+    def test_attach_poller_requires_3_args_2(self):
         a = Api(self.log, None)
         poller = 'abc'
         err = False
         try:
-            a.attach_poller(poller, None)
+            a.attach_poller(None, poller)
         except TypeError:
             err = True
         self.assertFalse(err)
-        self.assertTrue(poller in a.pollers)
+        self.assertTrue(poller in [c for (c, u) in a.pollers if  c == poller])
+
+    def test_attach_poller_requires_3_args_3(self):
+        a = Api(self.log, None)
+        poller = 'abc'
+        err = False
+        try:
+            a.attach_poller(None, poller, None)
+        except TypeError:
+            err = True
+        self.assertFalse(err)
+        self.assertTrue(poller in [c for (c, u) in a.pollers if  c == poller])
 
     def test_attach_does_not_check_callback_type(self):
         err = False
         a = Api(self.log, None)
         try:
-            a.attach_poller('abc')
+            a.attach_poller(None, 'abc')
         except:
             err = True
         self.assertFalse(err)
@@ -149,17 +160,29 @@ class ApiTestCase(unittest.TestCase):
     def test_poller_must_by_callable(self):
         # prepare
         a = Api(self.log, self.listeners)
+        # called when message is received
         e = self.mox.CreateMock(Event)
         e.processed = True
+        e.return_value = None
         def side_effect(a, b):
             e.return_value = b
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect).AndReturn(e)
+        # called when notifying pollers
+        e2 = self.mox.CreateMock(Event)
+        e2.processed = True
+        e2.return_value = None
+        def side_effect2(a, b):
+            e2.return_value = b
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect2).AndReturn(e2)
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
+        
         self.mox.ReplayAll()
 
         # test
-        a.attach_poller('a')
+        a.attach_poller(None, 'a')
         err = False
         try:
             a.recv('a', 'b', 'c')
@@ -173,14 +196,25 @@ class ApiTestCase(unittest.TestCase):
     def test_poller_is_called_on_recv(self):
         # prepare
         a = Api(self.log, self.listeners)
+        # called when message is received
         e = self.mox.CreateMock(Event)
         e.processed = True
+        e.return_value = None
         def side_effect(a, b):
             e.return_value = b
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect).AndReturn(e)
-
+        # called when notifying pollers
+        e2 = self.mox.CreateMock(Event)
+        e2.processed = True
+        e2.return_value = None
+        def side_effect2(a, b):
+            e2.return_value = b
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect2).AndReturn(e2)
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
+        # called when sending response to poller
         p = self.mox.CreateMockAnything()
         p(mox.IsA(list))
         
@@ -188,7 +222,7 @@ class ApiTestCase(unittest.TestCase):
 
         # test
         err = False
-        a.attach_poller(p)
+        a.attach_poller(None, p)
         try:
             a.recv('a', 'b', 'c')
         except TypeError:
