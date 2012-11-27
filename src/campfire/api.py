@@ -72,9 +72,9 @@ class Api(object):
             deepcopy(message)).return_value
         # prevent from returning message to user,
         # that should not read it
-        e = self.dispatcher.notifyUntil(\
-            Event(self, 'message.read.prevent', {'user': user}), \
-            deepcopy(message))
+        e = self.dispatcher.notify_until(\
+            Event(self, 'message.read.prevent', {'user': user, \
+                'message': deepcopy(message)}))
         if e.processed:
             return None
         return e.return_value
