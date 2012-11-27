@@ -7,6 +7,7 @@
 import unittest
 import mox
 import logging
+from functools import partial
 
 # hack for loading modules
 import _path
@@ -283,6 +284,45 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
         self.assertFalse(err)
 
+    def test_run(self):
+        # prepare
+        a = Api(self.log, self.listeners)
+        pollers = []
+
+        def side_effect(e, a, b):
+            e.return_value = b
+
+        # called when message is received
+        e = self.mox.CreateMock(Event)
+        e.processed = True
+        e.return_value = None
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            partial(side_effect, e)).AndReturn(e)
+
+        # called when notifying pollers
+        for i in xrange(1, 3):
+            e2 = self.mox.CreateMock(Event)
+            e2.processed = False
+            e2.return_value = None
+    
+            self.listeners.filter(mox.IsA(Event), mox.IsA(dict)\
+                ).WithSideEffects(partial(side_effect, e2)).AndReturn(e2)
+            self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
+            
+            # called when sending response to poller
+            p = self.mox.CreateMockAnything()
+            p(mox.IsA(list))
+            
+            a.attach_poller(None, p)
+
+        self.mox.ReplayAll()
+
+        # test
+        a.recv('a', 'b', 'c')
+
+        # verify
+        self.mox.VerifyAll()
 
 
 if "__main__" == __name__:
