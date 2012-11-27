@@ -77,7 +77,7 @@ class Api(object):
                 'message': copy.deepcopy(message)}))
         if e.processed:
             return None
-        return e.return_value
+        return msg
 
     def _notify(self, message):
         """
