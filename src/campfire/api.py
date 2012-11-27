@@ -79,14 +79,14 @@ class Api(object):
             return None
         return e.return_value
 
-    def _notify(self, data):
+    def _notify(self, message):
         """
         Sends response to all pollers
         """
         pollers = copy.copy(self.pollers)
         self.pollers = []
         for (callback, user) in pollers:
-            tmp = self._filter_output(user, data)
+            tmp = self._filter_output(user, message)
             # prevent from forgetting connection when message should be not send
             if tmp is None:
                 self.pollers.append((callback, users))
