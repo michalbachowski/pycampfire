@@ -193,6 +193,57 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
         self.assertTrue(err)
 
+    def test_detach_poller_requires_2_args(self):
+        a = Api(self.log, None)
+        err = False
+        try:
+            a.detach_poller()
+        except TypeError:
+            err = True
+        self.assertTrue(err)
+
+    def test_detach_poller_requires_2_args_1(self):
+        a = Api(self.log, None)
+        poller = 'abc'
+        err = False
+        try:
+            a.detach_poller(poller)
+        except TypeError:
+            err = True
+        self.assertFalse(err)
+
+    def test_detach_poller_checks_object_id(self):
+        a = Api(self.log, None)
+        poller = 'abc'
+        a.attach_poller(None, poller)
+        a.detach_poller('abc')
+        self.assertFalse(poller in [c for (c, u) in a.pollers if  c == poller])
+
+    def test_detach_poller_checks_object_id_1(self):
+        a = Api(self.log, None)
+        class Poller(object):
+            def poller(msg):
+                pass
+        poller1 = Poller().poller
+        poller2 = Poller().poller
+        a.attach_poller(None, poller1)
+        a.detach_poller(poller2)
+        self.assertTrue(poller1 in [c for (c, u) in a.pollers if  c == poller1])
+
+    def test_detach_poller_checks_object_id_2(self):
+        a = Api(self.log, None)
+        class Poller(object):
+            def poller(msg):
+                pass
+        poller1 = Poller().poller
+        poller2 = Poller().poller
+        a.attach_poller(None, poller1)
+        a.attach_poller(None, poller2)
+        a.detach_poller(poller2)
+        self.assertTrue(poller1 in [c for (c, u) in a.pollers if  c == poller1])
+        self.assertFalse(poller2 in [c for (c, u) in a.pollers \
+            if  c == poller2])
+
     def test_poller_is_called_on_recv(self):
         # prepare
         a = Api(self.log, self.listeners)
