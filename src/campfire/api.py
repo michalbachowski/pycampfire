@@ -111,12 +111,18 @@ class Api(object):
         self.pollers.append((callback, user))
         return self
 
+    def _do_detach(self, item):
+        """
+        Removed given item from pollers list
+        """
+        self.pollers.remove(item)
+
     def detach_poller(self, callback):
         """
         Detaches given poller from list of polles waiting for new messages
         """
         try:
-            map(l.remove, (s for s in l if s[0] == callback))
+            map(self._do_detach, (i for i in self.pollers if i[0] == callback))
         except ValueError:
             pass
         return self
