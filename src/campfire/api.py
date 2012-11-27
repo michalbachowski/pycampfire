@@ -110,7 +110,7 @@ class Api(object):
             if tmp is None:
                 self.log.debug('msg=reattaching poller; ' + \
                     'user=%s; callback=%s', user, callback)
-                self.pollers.append((callback, users))
+                self.pollers.append((callback, user))
             # send message
             else:
                 self.log.debug('msg=sending message to poller; ' + \
