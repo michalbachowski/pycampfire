@@ -289,6 +289,10 @@ class ApiTestCase(unittest.TestCase):
         a = Api(self.log, self.listeners)
         pollers = []
 
+        def side_effect1(e, a, b):
+            b['tmp'] = a['user']
+            e.return_value = b
+
         def side_effect(e, a, b):
             e.return_value = b
 
@@ -307,14 +311,14 @@ class ApiTestCase(unittest.TestCase):
             e2.return_value = None
     
             self.listeners.filter(mox.IsA(Event), mox.IsA(dict)\
-                ).WithSideEffects(partial(side_effect, e2)).AndReturn(e2)
+                ).WithSideEffects(partial(side_effect1, e2)).AndReturn(e2)
             self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
             
             # called when sending response to poller
             p = self.mox.CreateMockAnything()
-            p(mox.IsA(list))
-            
-            a.attach_poller(None, p)
+            p([{'tmp': i, 'data': {'message': 'a', 'args': 'c', 'from': None}, \
+                'id': mox.IsA(str)}])
+            a.attach_poller(i, p)
 
         self.mox.ReplayAll()
 
