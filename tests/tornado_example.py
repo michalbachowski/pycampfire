@@ -70,6 +70,11 @@ class ChatServer(tornado.web.Application):
             debug = options.debug
         )
 
+        # terminate app
+        signal.signal(signal.SIGTERM, lambda sig, stack_frame: api.terminate())
+        signal.signal(signal.SIGINT, lambda sig, stack_frame: api.terminate())
+
+        # start app
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
