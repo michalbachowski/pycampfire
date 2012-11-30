@@ -9,6 +9,8 @@ def arg_parser(parser=None):
         parser = argparse.ArgumentParser(description='Path config.')
     parser.add_argument('-f', '--fix', action='store_true', dest='fix', \
         help='Fix path to tested modules')
+    parser.add_argument('--debug', action='store_true', dest='debug', \
+        help='Run in debug mode')
     return parser
 
 def fix():
