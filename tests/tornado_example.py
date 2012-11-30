@@ -18,6 +18,8 @@
 # python std library
 import logging
 import os
+import sys
+import signal
 
 # hack for loading modules
 import _path
@@ -28,6 +30,7 @@ import tornado.auth
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
+from tornado.autoreload import add_reload_hook
 from tornado.options import define, options, parse_command_line
 from tornado.escape import json_encode
 
@@ -49,11 +52,15 @@ class ChatServer(tornado.web.Application):
     Main serwer class
     """
     def __init__(self, log):
-
+        # prepare params for handlers
         dispatcher = Dispatcher()
         api = campfire.Api(log, dispatcher)
         args = {'log': log, 'api': api}
+        # logging
+        if options.debug:
+            log.setLevel(logging.DEBUG)
 
+        # handlers and settings
         handlers = [
             (r"/chat/login", chat.AuthHandler, args),
             (r"/chat/logout", chat.AuthHandler, args),
@@ -70,9 +77,16 @@ class ChatServer(tornado.web.Application):
             debug = options.debug
         )
 
-        # terminate app
-        signal.signal(signal.SIGTERM, lambda sig, stack_frame: api.terminate())
-        signal.signal(signal.SIGINT, lambda sig, stack_frame: api.terminate())
+        # signal handlers
+        def _shutdown(signum, stack_frame):
+            api.shutdown()
+            sys.exit(1)
+        
+        signal.signal(signal.SIGTERM, _shutdown)
+        signal.signal(signal.SIGINT, _shutdown)
+
+        if options.debug:
+            add_reload_hook(api.shutdown)
 
         # start app
         tornado.web.Application.__init__(self, handlers, **settings)
@@ -108,7 +122,7 @@ def main():
 
     log.info('msg=server started; port=%u; debug=%s', options.port, \
         options.debug)
-    
+
     tornado.ioloop.IOLoop.instance().start()
 
 
