@@ -116,12 +116,12 @@ def main():
     parse_command_line()
 
     log = logging.getLogger('chat')
+    log.info('msg=starting server; port=%u; debug=%s', options.port, \
+        options.debug)
+
     http_server = tornado.httpserver.HTTPServer(ChatServer(log), \
         xheaders=True, no_keep_alive=True)
     http_server.listen(options.port)
-
-    log.info('msg=server started; port=%u; debug=%s', options.port, \
-        options.debug)
 
     tornado.ioloop.IOLoop.instance().start()
 
