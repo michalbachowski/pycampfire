@@ -327,6 +327,19 @@ class ApiTestCase(unittest.TestCase):
 
         # verify
         self.mox.VerifyAll()
+    
+    def test_init_sends_chat_init_event(self):
+        # called when initializing object
+        self.listeners.notify(mox.IsA(Event))
+
+        self.mox.ReplayAll()
+
+        # test
+        a = Api(self.log, self.listeners)
+        a.init()
+
+        # verify
+        self.mox.VerifyAll()
 
 
 if "__main__" == __name__:
