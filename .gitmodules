@@ -1,3 +1,6 @@
 [submodule "vendors/event.py"]
 	path = vendors/event.py
 	url = git@github.com:michalbachowski/event.py.git
+[submodule "vendors/js-campfire"]
+	path = vendors/js-campfire
+	url = git@github.com:michalbachowski/js-campfire.git
