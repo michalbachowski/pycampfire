@@ -37,14 +37,14 @@ class Api(object):
         """
         Notify chat initialization
         """
-        self.log.debug('msg=initialize chat')
+        self.log.info('msg=initialize chat')
         self.dispatcher.notify(Event(self, 'chat.init'))
 
     def shutdown(self):
         """
         Notify chat shutdown
         """
-        self.log.debug('msg=shutodown chat')
+        self.log.info('msg=shutdown chat')
         self.dispatcher.notify(Event(self, 'chat.shutdown'))
 
     def recv(self, message, user, args):
