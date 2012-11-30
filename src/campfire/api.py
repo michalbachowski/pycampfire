@@ -31,6 +31,20 @@ class Api(object):
 
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
 
+        self.init()
+
+    def init(self):
+        """
+        Notify chat initialization
+        """
+        self.dispatcher.notify(Event(self, 'chat.init'))
+
+    def shutdown(self):
+        """
+        Notify chat shutdown
+        """
+        self.dispatcher.notify(Event(self, 'chat.shutdown'))
+
     def recv(self, message, user, args):
         """
         Entry point for new massages
