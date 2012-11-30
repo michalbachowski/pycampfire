@@ -31,8 +31,6 @@ class Api(object):
 
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
 
-        self.init()
-
     def init(self):
         """
         Notify chat initialization
