@@ -347,6 +347,30 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
         self.assertEqual('chat.init', out['route'])
 
+    def test_shutdown_sends_event_and_closes_connections(self):
+        # prepare
+        a = Api(self.log, self.listeners)
+        
+        out = {'route': None}
+        def side_effect(e):
+            out['route'] = e.name
+
+        self.listeners.notify(mox.IsA(Event)).WithSideEffects(side_effect)
+        
+        # called when shutting down pollers
+        for i in xrange(1, 3):
+            p = self.mox.CreateMockAnything()
+            p(mox.IsA(list))
+            a.attach_poller(i, p)
+
+        self.mox.ReplayAll()
+
+        # test
+        a.shutdown()
+
+        # verify
+        self.mox.VerifyAll()
+        self.assertEqual('chat.shutdown', out['route'])
 
 if "__main__" == __name__:
     unittest.main()
