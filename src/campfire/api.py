@@ -69,6 +69,13 @@ class Api(object):
             user, e.return_value)
         return e.return_value
 
+    def _message(self, message, user, args):
+        """
+        Prepares message object
+        """
+        return {'id': str(uuid.uuid4()), 'data': {'message': message, \
+            'from': self._auth_user(user), 'args': args}}
+
     def _prepare_data(self, message, user, args):
         """
         Prepares message data
@@ -76,11 +83,8 @@ class Api(object):
         self.log.debug('msg=preparing message; message=%s; user=%s; args=%s', \
             message, user, args)
         # filter message and prepare final message structure
-        e = self.dispatcher.filter(\
-            Event(self, 'message.written'), \
-            {'id': str(uuid.uuid4()), 'data': {\
-                'message': message, 'from': self._auth_user(user), \
-                    'args': args}})
+        e = self.dispatcher.filter(Event(self, 'message.written'), \
+            self._message(message, user, args))
         self.log.debug('msg=message prepared; message=%s; user=%s; ' + \
             'args=%s; result=%s', message, user, args, e.return_value)
         return e.return_value
