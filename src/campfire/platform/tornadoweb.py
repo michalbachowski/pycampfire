@@ -59,6 +59,12 @@ class BaseHandler(tornado.web.RequestHandler):
         Prepares instance
         """
         self.api = api
+    
+    def prepare_response(self, response):
+        """
+        Prepare response ("stringify")
+        """
+        return json_encode(response)
 
     def get_error_html(self, status_code, exception=None, **kwargs):
         """
