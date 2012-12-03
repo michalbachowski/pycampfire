@@ -47,7 +47,7 @@ class Api(object):
         self.log.debug('msg=closing remaining connections')
         pollers = copy.copy(self.pollers)
         self.pollers = []
-        for (callback, user) in self.pollers:
+        for (callback, user) in pollers:
             self._respond([self._message('shutdown', {}, {})], callback)
         self.log.debug('msg=closed remaining connections')
         self.log.info('msg=shutdown chat')
