@@ -42,8 +42,15 @@ class Api(object):
         """
         Notify chat shutdown
         """
-        self.log.info('msg=shutdown chat')
+        self.log.debug('msg=shutting down chat')
         self.dispatcher.notify(Event(self, 'chat.shutdown'))
+        self.log.debug('msg=closing remaining connections')
+        pollers = copy.copy(self.pollers)
+        self.pollers = []
+        for (callback, user) in self.pollers:
+            self._respond([self._message('shutdown', {}, {})], callback)
+        self.log.debug('msg=closed remaining connections')
+        self.log.info('msg=shutdown chat')
 
     def recv(self, message, user, args):
         """
