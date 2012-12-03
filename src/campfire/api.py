@@ -154,7 +154,7 @@ class Api(object):
         Attaches poller to list of pollers waiting for message
         """
         self.log.debug('msg=processing new poller; ' + \
-            'user=%s; cursor=%s; poller=%s', user, cursor, poller)
+            'user=%s; cursor=%s; poller=%s', user, cursor, callback)
         tmp = self._fetch_cached_messages(user, cursor)
         if tmp:
             self.log.debug('msg=found messages newer than given cursor; ' + \
