@@ -26,6 +26,7 @@ class Api(object):
         ##
         # some important values
         #
+        self._initialized = False
         self._cache = deque([], cache_size)
         self.pollers = []
 
@@ -36,6 +37,7 @@ class Api(object):
         Notify chat initialization
         """
         self.log.info('msg=initialize chat')
+        self._initialized = True
         self.dispatcher.notify(Event(self, 'chat.init'))
 
     def shutdown(self):
@@ -52,6 +54,7 @@ class Api(object):
             self._respond([self._message('shutdown', {}, {})], callback)
             self.log.debug('msg=closed connection; poller=%s', repr(callback))
         self.log.debug('msg=closed remaining connections')
+        self._initialized = False
         self.log.info('msg=shutdown chat')
 
     def recv(self, message, user, args):
