@@ -50,6 +50,7 @@ class Api(object):
             raise ChatReinitializationForbiddenError()
         self._initialized = True
         self.dispatcher.notify(Event(self, 'chat.init'))
+        return self
 
     def shutdown(self):
         """
@@ -70,6 +71,7 @@ class Api(object):
         self.log.debug('msg=closed remaining connections')
         self._initialized = False
         self.log.info('msg=shutdown chat')
+        return self
 
     def recv(self, message, user, args):
         """
@@ -82,6 +84,7 @@ class Api(object):
         tmp = self._prepare_data(message, user, args)
         self._cache.appendleft(tmp)
         self._notify(tmp)
+        return self
 
     def _auth_user(self, user):
         """
