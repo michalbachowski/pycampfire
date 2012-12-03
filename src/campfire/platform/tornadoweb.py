@@ -79,7 +79,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if not exception is None:
             error['message'] = str(exception)
         response.append("error", error)
-        return json_encode(response)
+        return self.prepare_response(response)
 
     def post_message(self, arguments):
         """
