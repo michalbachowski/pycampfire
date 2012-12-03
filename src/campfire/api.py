@@ -85,27 +85,28 @@ class Api(object):
             'args=%s; result=%s', message, user, args, e.return_value)
         return e.return_value
 
-    def _filter_output(self, user, message):
+    def _filter_output(self, user, message, poller):
         """
         Filters messages before the will be send to user
         """
         # filter message
-        self.log.debug('msg=filter output message; message=%s; user=%s', \
-            message, user)
+        self.log.debug('msg=filter output message; message=%s; user=%s; ' + \
+            'poller=%s', message, user, poller)
         msg = self.dispatcher.filter(\
-            Event(self, 'message.read.filter', {'user': user}), \
-            copy.deepcopy(message)).return_value
+            Event(self, 'message.read.filter', {'user': user, \
+                'poller': poller}), copy.deepcopy(message)).return_value
         self.log.debug('msg=filtered output message; message=%s; user=%s; ' + \
-            'result=%s', message, user, msg)
+            'poller=%s; result=%s', message, user, poller, msg)
         # prevent from returning message to user,
         # that should not read it
         self.log.debug('msg=checking whether message can be send to user; ' + \
-            'message=%s; user=%s', msg, user)
+            'message=%s; user=%s; poller=%s', msg, user, poller)
         e = self.dispatcher.notify_until(\
             Event(self, 'message.read.prevent', {'user': user, \
-                'message': copy.deepcopy(message)}))
+                'poller': poller, 'message': copy.deepcopy(message)}))
         self.log.debug('msg=checked whether message can be send to user; ' + \
-            'message=%s; user=%s; result=%s', msg, user, e.processed)
+            'message=%s; user=%s; poller=%s; result=%s', msg, user, poller, \
+            e.processed)
         if e.processed:
             return None
         return msg
@@ -119,16 +120,16 @@ class Api(object):
         pollers = copy.copy(self.pollers)
         self.pollers = []
         for (callback, user) in pollers:
-            tmp = self._filter_output(user, message)
+            tmp = self._filter_output(user, message, repr(callback))
             # prevent from forgetting connection when message should be not send
             if tmp is None:
                 self.log.debug('msg=reattaching poller; ' + \
-                    'user=%s; callback=%s', user, callback)
+                    'user=%s; poller=%s', user, repr(callback))
                 self.pollers.append((callback, user))
             # send message
             else:
                 self.log.debug('msg=sending message to poller; ' + \
-                    'user=%s; callback=%s', user, callback)
+                    'user=%s; poller=%s', user, repr(callback))
                 self._respond([tmp], callback)
 
     def _respond(self, message, callback):
@@ -142,15 +143,16 @@ class Api(object):
         Attaches poller to list of pollers waiting for message
         """
         self.log.debug('msg=processing new poller; ' + \
-            'user=%s; cursor=%s', user, cursor)
+            'user=%s; cursor=%s; poller=%s', user, cursor, poller)
         tmp = self._fetch_cached_messages(user, cursor)
         if tmp:
             self.log.debug('msg=found messages newer than given cursor; ' + \
-                'user=%s; cursor=%s; nummsg=%u', user, cursor, len(tmp))
+                'user=%s; cursor=%s; poller=%s; nummsg=%u', user, cursor, \
+                repr(callback), len(tmp))
             self._respond(tmp, callback)
             return
         self.log.debug('msg=attaching new poller; ' + \
-            'user=%s; callback=%s', user, callback)
+            'user=%s; poller=%s', user, repr(callback))
         self.pollers.append((callback, user))
         return self
 
@@ -158,16 +160,16 @@ class Api(object):
         """
         Removed given item from pollers list
         """
-        self.log.debug('msg=detaching poller; user=%s; callback=%s', item[1], \
-            item[0])
+        self.log.debug('msg=detaching poller; user=%s; poller=%s', item[1], \
+            repr(item[0]))
         self.pollers.remove(item)
 
     def detach_poller(self, callback):
         """
         Detaches given poller from list of polles waiting for new messages
         """
-        self.log.debug('msg=detaching pollers for callback; callback=%s', \
-            callback)
+        self.log.debug('msg=detaching pollers for callback; poller=%s', \
+            repr(callback))
         try:
             map(self._do_detach, (i for i in self.pollers if i[0] == callback))
         except ValueError:
