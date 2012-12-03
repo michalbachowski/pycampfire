@@ -124,6 +124,12 @@ class HttpHandler(BaseHandler):
             return
         self.finish(self.prepare_response(response))
 
+    def on_connection_close(self):
+        """
+        Cleanup async connections on close
+        """
+        self.api.detach_poller(self._respond)
+
 
 class SocketHandler(BaseHandler, tornado.websocket.WebSocketHandler):
     """
