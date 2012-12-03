@@ -329,8 +329,13 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
     
     def test_init_sends_chat_init_event(self):
+        # prepare
+        out = {'route': None}
+        def side_effect(e):
+            out['route'] = e.name
+
         # called when initializing object
-        self.listeners.notify(mox.IsA(Event))
+        self.listeners.notify(mox.IsA(Event)).WithSideEffects(side_effect)
 
         self.mox.ReplayAll()
 
@@ -340,6 +345,7 @@ class ApiTestCase(unittest.TestCase):
 
         # verify
         self.mox.VerifyAll()
+        self.assertEqual('chat.init', out['route'])
 
 
 if "__main__" == __name__:
