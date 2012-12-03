@@ -8,6 +8,14 @@ from event import Event
 import copy
 
 
+class UninitializedChatError(RuntimeError):
+    pass
+
+
+class ChatReinitializationForbiddenError(RuntimeError):
+    pass
+
+
 class Api(object):
     """
     Api class that provides two main methods:
@@ -37,6 +45,9 @@ class Api(object):
         Notify chat initialization
         """
         self.log.info('msg=initialize chat')
+        # prevent reinitialization
+        if self._initialized:
+            raise ChatReinitializationForbiddenError()
         self._initialized = True
         self.dispatcher.notify(Event(self, 'chat.init'))
 
@@ -45,6 +56,9 @@ class Api(object):
         Notify chat shutdown
         """
         self.log.debug('msg=shutting down chat')
+        # prevent shutdown of unitialized app
+        if not self._initialized:
+            raise UninitializedChatError()
         self.dispatcher.notify(Event(self, 'chat.shutdown'))
         self.log.debug('msg=closing remaining connections')
         pollers = copy.copy(self.pollers)
@@ -63,6 +77,8 @@ class Api(object):
         """
         self.log.info('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
+        if not self._initialized:
+            raise UninitializedChatError()
         tmp = self._prepare_data(message, user, args)
         self._cache.appendleft(tmp)
         self._notify(tmp)
@@ -158,6 +174,8 @@ class Api(object):
         """
         Attaches poller to list of pollers waiting for message
         """
+        if not self._initialized:
+            raise UninitializedChatError()
         self.log.debug('msg=processing new poller; ' + \
             'user=%s; cursor=%s; poller=%s', user, cursor, callback)
         tmp = self._fetch_cached_messages(user, cursor)
@@ -184,6 +202,8 @@ class Api(object):
         """
         Detaches given poller from list of polles waiting for new messages
         """
+        if not self._initialized:
+            raise UninitializedChatError()
         self.log.debug('msg=detaching pollers for callback; poller=%s', \
             repr(callback))
         try:
