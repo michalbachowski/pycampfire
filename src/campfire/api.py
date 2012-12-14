@@ -60,7 +60,9 @@ class Api(object):
         # prevent shutdown of unitialized app
         if not self._initialized:
             raise UninitializedChatError()
+        self._initialized = False
         self.dispatcher.notify(Event(self, 'chat.shutdown'))
+        # close connections
         self.log.debug('msg=closing remaining connections')
         pollers = copy.copy(self.pollers)
         self.pollers = []
@@ -69,7 +71,6 @@ class Api(object):
             self._respond([self._message('shutdown', {}, {})], callback)
             self.log.debug('msg=closed connection; poller=%s', repr(callback))
         self.log.debug('msg=closed remaining connections')
-        self._initialized = False
         self.log.info('msg=shutdown chat')
         return self
 
