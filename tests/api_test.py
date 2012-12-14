@@ -19,7 +19,8 @@ from event import Dispatcher, Event
 ##
 # campfire api modules
 #
-from campfire.api import Api
+from campfire.api import Api, ChatReinitializationForbiddenError, \
+    UninitializedChatError
 
 
 class ApiTestCase(unittest.TestCase):
@@ -358,6 +359,15 @@ class ApiTestCase(unittest.TestCase):
         self.mox.VerifyAll()
         self.assertEqual('chat.init', out['route'])
 
+    def test_init_prevents_reinitialization(self):
+        err = False
+        self.api.init()
+        try:
+            self.api.init()
+        except ChatReinitializationForbiddenError:
+            err = True
+        self.assertTrue(err)
+
     def test_shutdown_sends_event_and_closes_connections(self):
         # prepare
         pollers = []
@@ -385,6 +395,14 @@ class ApiTestCase(unittest.TestCase):
         # verify
         self.mox.VerifyAll()
         self.assertEqual('chat.shutdown', out['route'])
+    
+    def test_shutdown_raises_exception_when_chat_is_not_initialized(self):
+        err = False
+        try:
+            self.api.shutdown()
+        except UninitializedChatError:
+            err = True
+        self.assertTrue(err)
 
 if "__main__" == __name__:
     unittest.main()
