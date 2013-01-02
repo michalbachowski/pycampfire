@@ -82,10 +82,12 @@ class Api(object):
             message, user, args)
         if not self._initialized:
             raise UninitializedChatError()
+        # prepare message
         tmp = self._prepare_data(message, user, args)
         self._cache.appendleft(tmp)
         self._notify(tmp)
-        return self
+        # prepare response to request
+        return self._prepare_response(tmp)
 
     def _auth_user(self, user):
         """
@@ -119,6 +121,18 @@ class Api(object):
             self._message(message, self._auth_user(user), args))
         self.log.debug('msg=message prepared; message=%s; user=%s; ' + \
             'args=%s; result=%s', message, user, args, e.return_value)
+        return e.return_value
+    
+    def _prepare_response(self, message):
+        """
+        Prepares response to Api.recv() request
+        """
+        self.log.debug('msg=prepare response to "recv()" request; ' + \
+            'message=%s;', message)
+        e = self.dispatcher.filter(Event(self, 'message.request.response', \
+            {'message': message}), {})
+        self.log.debug('msg=prepared response to "recv()" request; ' + \
+            'message=%s; result=%s', message, e.return_value)
         return e.return_value
 
     def _filter_output(self, user, message, poller):

@@ -264,7 +264,7 @@ class ApiTestCase(unittest.TestCase):
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect).AndReturn(e)
-        # called when notifying pollers
+        # called when notifying pollers (filter output)
         e2 = self.mox.CreateMock(Event)
         e2.processed = False
         e2.return_value = None
@@ -276,6 +276,14 @@ class ApiTestCase(unittest.TestCase):
         # called when sending response to poller
         p = self.mox.CreateMockAnything()
         p(mox.IsA(list))
+        # called before sending response to poller
+        e1 = self.mox.CreateMock(Event)
+        e1.processed = True
+        e1.return_value = None
+        def side_effect1(a, b):
+            e1.return_value = b
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect1).AndReturn(e1)
         
         self.mox.ReplayAll()
         self.api.init()
@@ -326,6 +334,14 @@ class ApiTestCase(unittest.TestCase):
             p([{'tmp': i, 'data': {'message': 'a', 'args': 'c', 'from': None}, \
                 'id': mox.IsA(str)}])
             pollers.append(p)
+        # called when preparing response to request
+        e1 = self.mox.CreateMock(Event)
+        e1.processed = True
+        e1.return_value = None
+        def side_effect1(a, b):
+            e1.return_value = b
+        self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
+            side_effect1).AndReturn(e1)
 
         self.mox.ReplayAll()
         
