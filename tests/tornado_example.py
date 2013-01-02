@@ -54,9 +54,10 @@ class ChatServer(tornado.web.Application):
     def __init__(self, log):
         # prepare params for handlers
         dispatcher = Dispatcher()
+        auth = chat.AuthHelper()
         api = campfire.Api(log, dispatcher)
         api.init()
-        args = {'log': log, 'api': api}
+        args = {'log': log, 'api': api, 'auth': auth}
         # logging
         if options.debug:
             log.setLevel(logging.DEBUG)

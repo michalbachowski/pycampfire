@@ -22,11 +22,14 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import tornado.websocket
+from tornado.escape import json_encode, json_decode
+
 import os.path
 import copy
+import uuid
+import time
 import functools
 import logging
-from tornado.escape import json_encode, json_decode
 
 
 class Response(dict):
@@ -53,12 +56,14 @@ class BaseHandler(tornado.web.RequestHandler):
     """
     Base class for chat handlers
     """
-
-    def initialize(self, log, api):
+    
+    def initialize(self, log, api, auth):
         """
         Prepares instance
         """
         self.api = api
+        self.auth = auth
+        self.cookie_name = 'chat_user'
     
     def prepare_response(self, response):
         """
@@ -94,6 +99,13 @@ class BaseHandler(tornado.web.RequestHandler):
         # write message
         return self.api.recv(arguments['message'], self.current_user, auxArgs)
 
+    def get_current_user(self):
+        """
+        Fetches current user
+        """
+        cookie = self.get_secure_cookie(self.cookie_name)
+        return self.auth.get_current_user(cookie)
+
 
 class HttpHandler(BaseHandler):
     """
@@ -105,7 +117,9 @@ class HttpHandler(BaseHandler):
         """
         Write message
         """
-        self.write(self.post_message(arguments))
+        response = Response()
+        response.update(self.post_message(self.request.arguments))
+        self.write(response)
 
     @tornado.web.asynchronous
     def get(self):
@@ -179,30 +193,88 @@ class SocketHandler(BaseHandler, tornado.websocket.WebSocketHandler):
         self.attach_poller()
 
 
+class AuthHelper(object):
+    profiles = {} # list of profiles
+    tokens = {}   # map token to profile
+
+    userStruct = {
+        'id': -1,
+        'name': 'Guest',
+        'logged': False,
+        'hasAccount': False
+    }
+
+    def login(self, user, ip):
+        """
+        Logs user in
+        """
+        # profile
+        profile = copy.deepcopy(self.userStruct)
+        profile.update({'name': user, 'logged': True, \
+            'ip': ip})
+        # cookie
+        token = str(uuid.uuid4())
+        self.profiles[user] = profile
+        self.tokens[token] = {'user': user, 'lastvisit': time.time()}
+        return token
+
+    def logout(self, token):
+        """
+        Logs user out
+        """
+        del self.profiles[self.tokens[token]['user']]
+        del self.tokens[token]
+
+    def get_current_user(self, token):
+        """
+        Fetches current user profile
+        """
+        # bump lastvisit time
+        try:
+            self.tokens[token]['lastvisit'] = time.time()
+            return self.profiles[self.tokens[token]['user']]
+        except KeyError:
+            if token in self.tokens:
+                del self.tokens[token]
+            return None
+
+
 class AuthHandler(BaseHandler):
     """
     Chat authentication handler
     """
+    cookie_lifetime = 1 # days
 
-    @tornado.web.asynchronous
     def post(self):
         """
         Login
         """
         user = self.get_argument("login")
         response = Response()
-        if user:
-            (response, user) = self.login(self, user, self.current_user)
         if not user:
             raise tornado.web.HTTPError(401, "Auth failed")
-        response.append( "auth", "Logged In" )
-        self.finish( self.encodeOutput( response, ext ) )
+        if user in self.profiles:
+            raise tornado.web.HTTPError(403, "Login used")
+        # remember
+        cookie = self.auth.login(user, self.request.remote_ip)
+        # response
+        response.append("auth", "Logged In")
+        response.append("profile", profile)
+        self.set_secure_cookie(self.cookie_name, cookie, self.cookie_lifetime)
+        self.finish(self.prepare_response(response))
 
     @tornado.web.authenticated
     def delete(self):
         """
         Logout
         """
-        response = self.logout(self, self.current_user)
-        response.append( "auth", "You are now logged out" )
-        self.write( self.encodeOutput( response, ext ) )
+        cookie = self.get_secure_cookie(self.cookie_name)
+        # logout
+        self.auth.logout(cookie)
+        # remove cookie
+        self.set_secure_cookie(self.cookie_name, None, -1)
+        response = Response()
+        response.append("auth", "You are now logged out")
+        self.finish(self.prepare_response(response))
+
+    # TODO: periodic callback to logout users
