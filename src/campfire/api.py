@@ -15,6 +15,9 @@ class UninitializedChatError(RuntimeError):
 class ChatReinitializationForbiddenError(RuntimeError):
     pass
 
+class AuthError(RuntimeError):
+    pass
+
 
 class Api(object):
     """
