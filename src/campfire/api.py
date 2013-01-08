@@ -123,16 +123,18 @@ class Api(object):
         e = self.dispatcher.filter(Event(self, 'message.received', \
             {'response': {}}), self._message(message, self._auth_user(user), \
             args))
+        response = e['response']
         self.log.debug('msg=message prepared; message=%s; user=%s; ' + \
-            'args=%s; result=%s', message, user, args, e.return_value)
-        return (e.return_value, e['response'])
+            'args=%s; result=%s; response=%s;', message, user, args, \
+            e.return_value, response)
+        return (e.return_value, response)
     
     def _prepare_response(self, message, response):
         """
         Prepares response to Api.recv() request
         """
         self.log.debug('msg=prepare response to "recv()" request; ' + \
-            'message=%s;', message)
+            'message=%s; response=%s', message, response)
         e = self.dispatcher.filter(Event(self, 'message.request.response', \
             {'message': message}), response)
         self.log.debug('msg=prepared response to "recv()" request; ' + \
