@@ -97,7 +97,8 @@ class BaseHandler(tornado.web.RequestHandler):
                 continue
             auxArgs[arg] = arguments.get(arg, None)
         # write message
-        return self.api.recv(arguments['message'], self.current_user, auxArgs)
+        return self.api.recv(arguments['message'][0], self.current_user, \
+            auxArgs)
 
     def get_current_user(self):
         """
