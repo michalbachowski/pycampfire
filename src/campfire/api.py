@@ -21,7 +21,7 @@ class AuthError(RuntimeError):
 
 class Api(object):
     """
-    Api class that provides two main methods:
+    Main chat class
     """
 
     def __init__(self, log, dispatcher, cache_size=120):
