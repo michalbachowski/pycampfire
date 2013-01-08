@@ -263,7 +263,7 @@ class AuthHandler(BaseHandler):
             raise tornado.web.HTTPError(403, "Login used")
         # response
         response.append("auth", "Logged In")
-        response.append("profile", profile)
+        response.append("profile", self.auth.get_current_user(cookie))
         self.set_secure_cookie(self.cookie_name, cookie, self.cookie_lifetime)
         self.finish(self.prepare_response(response))
 
