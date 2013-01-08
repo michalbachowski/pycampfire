@@ -37,6 +37,7 @@ from tornado.escape import json_encode
 # chat modules
 import campfire
 import campfire.platform.tornadoweb as chat
+import campfire.plugins as plugins
 
 # EventDispatcher modules
 from event import Dispatcher
@@ -54,6 +55,9 @@ class ChatServer(tornado.web.Application):
     def __init__(self, log):
         # prepare params for handlers
         dispatcher = Dispatcher()
+        # attach listeners
+        plugins.NoAuth().register(dispatcher)
+
         auth = chat.AuthHelper()
         api = campfire.Api(log, dispatcher)
         api.init()
