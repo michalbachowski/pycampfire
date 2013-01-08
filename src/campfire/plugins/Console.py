@@ -61,6 +61,7 @@ class Console(Plugin):
             else:
                 permissions = None
             self.attach_command(plugin, action, method, permissions)
+        return True
 
     def attach_command(self, plugin, action, method, checker=None):
         """
