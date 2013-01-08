@@ -60,6 +60,7 @@ class ChatServer(tornado.web.Application):
         # prepare dispatcher and listeners (plugins)
         dispatcher = Dispatcher()
         plugins.NoAuth().register(dispatcher)
+        plugins.Console().register(dispatcher)
 
         # prepare auth handler
         auth = chat.AuthHelper()
