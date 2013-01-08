@@ -209,6 +209,8 @@ class AuthHelper(object):
         """
         Logs user in
         """
+        if user in self.profiles:
+            raise RuntimeError("Login used")
         # profile
         profile = copy.deepcopy(self.userStruct)
         profile.update({'name': user, 'logged': True, \
@@ -254,10 +256,11 @@ class AuthHandler(BaseHandler):
         response = Response()
         if not user:
             raise tornado.web.HTTPError(401, "Auth failed")
-        if user in self.profiles:
-            raise tornado.web.HTTPError(403, "Login used")
         # remember
-        cookie = self.auth.login(user, self.request.remote_ip)
+        try:
+            cookie = self.auth.login(user, self.request.remote_ip)
+        except RuntimeError:
+            raise tornado.web.HTTPError(403, "Login used")
         # response
         response.append("auth", "Logged In")
         response.append("profile", profile)
