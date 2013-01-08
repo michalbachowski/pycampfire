@@ -8,11 +8,20 @@ class Plugin(Listener):
     Base abstract Plugin class
     """
 
+    def __init__(self):
+        """
+        Object inizialization
+        """
+        self.log = None
+
     @synchronous
     def init(self, event):
         """
         Method called on chat initialization
         """
+        self.log = event['log']
+        self.log.debug('msg=initializing plugin; plugin=%s', \
+            self.__class__.__name__)
         return self._init(event)
 
     def _init(self, event):
@@ -26,6 +35,8 @@ class Plugin(Listener):
         """
         Method called on chat shutdown
         """
+        self.log.debug('msg=shutting down plugin; plugin=%s', \
+            self.__class__.__name__)
         return self._shutdown(event)
 
     def _shutdown(self, event):

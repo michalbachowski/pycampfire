@@ -52,7 +52,7 @@ class Api(object):
         if self._initialized:
             raise ChatReinitializationForbiddenError()
         self._initialized = True
-        self.dispatcher.notify(Event(self, 'chat.init'))
+        self.dispatcher.notify(Event(self, 'chat.init', {'log': self.log}))
         return self
 
     def shutdown(self):
