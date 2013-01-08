@@ -104,7 +104,7 @@ class Api(object):
             raise AuthError()
         self.log.debug('msg=user authenticated; user=%s; result=%s', \
             user, e.return_value)
-        return e.return_value
+        return user
 
     def _message(self, message, user, args):
         """
