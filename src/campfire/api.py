@@ -110,8 +110,8 @@ class Api(object):
         """
         Prepares message object
         """
-        return {'id': str(uuid.uuid4()), 'data': {'message': message, \
-            'from': user, 'args': args}}
+        return {'id': str(uuid.uuid4()), 'text': message, \
+            'from': user, 'args': args}
 
     def _prepare_message(self, message, user, args):
         """
