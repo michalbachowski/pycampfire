@@ -86,11 +86,11 @@ class Api(object):
         if not self._initialized:
             raise UninitializedChatError()
         # prepare message
-        self._cache.appendleft(tmp)
-        self._notify(tmp)
-        tmp = self._prepare_message(message, user, args)
+        (msg, response) = self._prepare_message(message, user, args)
+        self._cache.appendleft(msg)
+        self._notify(msg)
         # prepare response to request
-        return self._prepare_response(tmp)
+        return self._prepare_response(msg, response)
 
     def _auth_user(self, user):
         """
@@ -120,20 +120,21 @@ class Api(object):
         self.log.debug('msg=preparing message; message=%s; user=%s; args=%s', \
             message, user, args)
         # filter message and prepare final message structure
-        e = self.dispatcher.filter(Event(self, 'message.written'), \
-            self._message(message, self._auth_user(user), args))
+        e = self.dispatcher.filter(Event(self, 'message.received', \
+            {'response': {}}), self._message(message, self._auth_user(user), \
+            args))
         self.log.debug('msg=message prepared; message=%s; user=%s; ' + \
             'args=%s; result=%s', message, user, args, e.return_value)
-        return e.return_value
+        return (e.return_value, e['response'])
     
-    def _prepare_response(self, message):
+    def _prepare_response(self, message, response):
         """
         Prepares response to Api.recv() request
         """
         self.log.debug('msg=prepare response to "recv()" request; ' + \
             'message=%s;', message)
         e = self.dispatcher.filter(Event(self, 'message.request.response', \
-            {'message': message}), {})
+            {'message': message}), response)
         self.log.debug('msg=prepared response to "recv()" request; ' + \
             'message=%s; result=%s', message, e.return_value)
         return e.return_value
