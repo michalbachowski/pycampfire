@@ -170,6 +170,7 @@ class ApiTestCase(unittest.TestCase):
         e = self.mox.CreateMock(Event)
         e.processed = True
         e.return_value = None
+        e.__getitem__('response').AndReturn({})
         def side_effect(a, b):
             e.return_value = b
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
@@ -259,6 +260,7 @@ class ApiTestCase(unittest.TestCase):
         e = self.mox.CreateMock(Event)
         e.processed = True
         e.return_value = None
+        e.__getitem__('response').AndReturn({})
         def side_effect(a, b):
             e.return_value = b
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
@@ -315,6 +317,7 @@ class ApiTestCase(unittest.TestCase):
         e = self.mox.CreateMock(Event)
         e.processed = True
         e.return_value = None
+        e.__getitem__('response').AndReturn({})
         self.listeners.notify_until(mox.IsA(Event)).AndReturn(e)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             partial(side_effect, e)).AndReturn(e)
