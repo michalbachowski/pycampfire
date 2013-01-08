@@ -53,18 +53,22 @@ class ChatServer(tornado.web.Application):
     Main serwer class
     """
     def __init__(self, log):
-        # prepare params for handlers
-        dispatcher = Dispatcher()
-        # attach listeners
-        plugins.NoAuth().register(dispatcher)
-
-        auth = chat.AuthHelper()
-        api = campfire.Api(log, dispatcher)
-        api.init()
-        args = {'log': log, 'api': api, 'auth': auth}
         # logging
         if options.debug:
             log.setLevel(logging.DEBUG)
+
+        # prepare dispatcher and listeners (plugins)
+        dispatcher = Dispatcher()
+        plugins.NoAuth().register(dispatcher)
+
+        # prepare auth handler
+        auth = chat.AuthHelper()
+
+        # prepare API instance and run chat
+        api = campfire.Api(log, dispatcher)
+        api.init()
+
+        args = {'log': log, 'api': api, 'auth': auth}
 
         # handlers and settings
         handlers = [
