@@ -334,7 +334,7 @@ class ApiTestCase(unittest.TestCase):
             self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
             
             p = self.mox.CreateMockAnything()
-            p([{'tmp': i, 'data': {'message': 'a', 'args': 'c', 'from': None}, \
+            p([{'tmp': i, 'text': 'a', 'args': 'c', 'from': 'b', \
                 'id': mox.IsA(str)}])
             pollers.append(p)
         # called when preparing response to request
