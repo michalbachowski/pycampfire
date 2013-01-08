@@ -86,9 +86,9 @@ class Api(object):
         if not self._initialized:
             raise UninitializedChatError()
         # prepare message
-        tmp = self._prepare_data(message, user, args)
         self._cache.appendleft(tmp)
         self._notify(tmp)
+        tmp = self._prepare_message(message, user, args)
         # prepare response to request
         return self._prepare_response(tmp)
 
@@ -113,7 +113,7 @@ class Api(object):
         return {'id': str(uuid.uuid4()), 'data': {'message': message, \
             'from': user, 'args': args}}
 
-    def _prepare_data(self, message, user, args):
+    def _prepare_message(self, message, user, args):
         """
         Prepares message data
         """
