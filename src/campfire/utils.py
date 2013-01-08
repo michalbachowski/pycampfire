@@ -58,5 +58,4 @@ class Plugin(Listener):
         Returns list of listeners to be attached to dispatcher.
         [(event name, listener, priority), (event name, listener, priority)]
         """
-        raise NotImplementedError('Return list of tuples with ' +\
-            '(event, callback priority) mappings')
+        return []
