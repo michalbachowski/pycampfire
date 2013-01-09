@@ -259,6 +259,13 @@ class AuthHandler(BaseHandler):
         self.finish(self.prepare_response(response))
 
     @tornado.web.authenticated
+    def get(self):
+        """
+        Logout (not all browsers support DELETE method)
+        """
+        self.delete()
+    
+    @tornado.web.authenticated
     def delete(self):
         """
         Logout
