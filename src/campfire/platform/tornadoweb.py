@@ -276,7 +276,7 @@ class AuthHandler(BaseHandler):
         # remove cookie
         self.set_secure_cookie(self.cookie_name, '', -1)
         response = Response()
-        response.append("auth", "You are now logged out")
+        response["auth"] = "You are now logged out"
         self.finish(self.prepare_response(response))
 
     # TODO: periodic callback to logout users
