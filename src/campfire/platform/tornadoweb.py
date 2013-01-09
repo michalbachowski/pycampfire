@@ -121,14 +121,16 @@ class HttpHandler(BaseHandler):
         self.api.attach_poller(self.current_user, \
             self._respond, self.get_argument("cursor", None))
 
-    def _respond(self, response):
+    def _respond(self, messages):
         """
         Send response
         """
         # Closed client connection
         if self.request.connection.stream.closed():
             return
-        self.finish(self.prepare_response(response))
+        r = Response()
+        r['messages'] = messages
+        self.finish(self.prepare_response(r))
 
     def on_connection_close(self):
         """
