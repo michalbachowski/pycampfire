@@ -35,15 +35,6 @@ import logging
 class Response(dict):
     def __init__(self):
         self.__setitem__('status', 1)
-        self.__setitem__('response', {})
-
-    def append(self, prefix, message, extend=False):
-        if prefix not in self['response']:
-            self['response'][prefix] = []
-        if type(message) == type(list()) and extend:
-            self['response'][prefix].extend(message)
-        else:
-            self['response'][prefix].append(message)
 
     def mark_failure(self):
         self.__setitem__('status', 0)
@@ -78,12 +69,12 @@ class BaseHandler(tornado.web.RequestHandler):
         response = Response()
         response.mark_failure()
         error = {
-            'status': status_code,
+            'code': status_code,
             'message': '',
         }
         if not exception is None:
             error['message'] = str(exception)
-        response.append("error", error)
+        response["error"] = error
         return self.prepare_response(response)
 
     def post_message(self, arguments):
@@ -262,8 +253,8 @@ class AuthHandler(BaseHandler):
         except RuntimeError:
             raise tornado.web.HTTPError(403, "Login used")
         # response
-        response.append("auth", "Logged In")
-        response.append("profile", self.auth.get_current_user(cookie))
+        response["auth"]  = "Logged In"
+        response["profile"] = self.auth.get_current_user(cookie)
         self.set_secure_cookie(self.cookie_name, cookie, self.cookie_lifetime)
         self.finish(self.prepare_response(response))
 
