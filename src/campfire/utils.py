@@ -7,12 +7,22 @@ class Plugin(Listener):
     """
     Base abstract Plugin class
     """
+    user_attrs = ['id', 'ip', 'name']
 
     def __init__(self):
         """
         Object inizialization
         """
         self.log = None
+
+    def match_user(self, user, possibilities):
+        """
+        Tests whether something within given user structure is contained in 
+        given possibilities
+        """
+        return [v for (k, v) in user.iteritems() \
+            if k in Plugin.user_attrs and v in possibilities]
+
 
     @synchronous
     def init(self, event):
