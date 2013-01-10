@@ -145,14 +145,6 @@ class Api(object):
         """
         Filters messages before the will be send to user
         """
-        # filter message
-        self.log.debug('msg=filter output message; message=%s; user=%s; ' + \
-            'poller=%s', message, user, poller)
-        msg = self.dispatcher.filter(\
-            Event(self, 'message.read.filter', {'user': user, \
-                'poller': poller}), copy.deepcopy(message)).return_value
-        self.log.debug('msg=filtered output message; message=%s; user=%s; ' + \
-            'poller=%s; result=%s', message, user, poller, msg)
         # prevent from returning message to user,
         # that should not read it
         self.log.debug('msg=checking whether message can be send to user; ' + \
@@ -165,6 +157,14 @@ class Api(object):
             e.processed)
         if e.processed:
             return None
+        # filter message
+        self.log.debug('msg=filter output message; message=%s; user=%s; ' + \
+            'poller=%s', message, user, poller)
+        msg = self.dispatcher.filter(\
+            Event(self, 'message.read.filter', {'user': user, \
+                'poller': poller}), copy.deepcopy(message)).return_value
+        self.log.debug('msg=filtered output message; message=%s; user=%s; ' + \
+            'poller=%s; result=%s', message, user, poller, msg)
         return msg
 
     def _notify(self, message):
