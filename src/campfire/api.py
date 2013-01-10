@@ -242,9 +242,10 @@ class Api(object):
         """
         self.log.debug('msg=fetching cached messages; user=%s; cursor=%s; ' + \
             'poller=%s', user, cursor, callback_repr)
-        tmp = map(lambda a: a is not None, [self._filter_output(user, i) \
-            for i in takewhile(partial(self._compare_index, cursor), \
-                self._cache)])
+        tmp = map(lambda a: a is not None, \
+            [self._filter_output(user, i, callback_repr) \
+                for i in takewhile(partial(self._compare_index, cursor), \
+                    self._cache)])
         self.log.debug('msg=fetched cached messages; user=%s; cursor=%s; ' + \
             'nummsg=%u', user, cursor, len(tmp))
         return tmp
