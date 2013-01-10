@@ -29,6 +29,8 @@ class Dice(Plugin):
         """
         Handles new message
         """
+        if data is None:
+            return data
         if '/roll' != data['text'][0:5]:
             return data
         try:
