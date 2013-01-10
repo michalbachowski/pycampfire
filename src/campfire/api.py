@@ -201,8 +201,8 @@ class Api(object):
         if not self._initialized:
             raise UninitializedChatError()
         self.log.debug('msg=processing new poller; ' + \
-            'user=%s; cursor=%s; poller=%s', user, cursor, callback)
-        tmp = self._fetch_cached_messages(user, cursor)
+            'user=%s; cursor=%s; poller=%s', user, cursor, repr(callback))
+        tmp = self._fetch_cached_messages(user, cursor, repr(callback))
         if tmp:
             self.log.debug('msg=found messages newer than given cursor; ' + \
                 'user=%s; cursor=%s; poller=%s; nummsg=%u', user, cursor, \
