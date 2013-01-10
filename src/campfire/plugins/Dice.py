@@ -8,7 +8,7 @@ import random
 ##
 # campfire.api
 from campfire.utils import Plugin
-
+from event import synchronous
 
 class Dice(Plugin):
     """
@@ -24,6 +24,7 @@ class Dice(Plugin):
         """
         return [('message.received', self.on_new_message)]
     
+    @synchronous
     def on_new_message(self, event, data):
         """
         Handles new message

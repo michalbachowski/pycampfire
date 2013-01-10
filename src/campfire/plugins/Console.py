@@ -10,7 +10,7 @@ from collections import defaultdict
 ##
 # campfire.api
 from campfire.utils import Plugin
-
+from event import synchronous
 
 class Console(Plugin):
     """
@@ -44,6 +44,7 @@ class Console(Plugin):
         return [('console.command.add', self.add_command), \
             ('message.received', self.on_new_message, 10)]
 
+    @synchronous
     def add_command(self, event):
         """
         Adds new command with proper permissions
@@ -107,6 +108,7 @@ class Console(Plugin):
         except:
             return []
 
+    @synchronous
     def on_new_message(self, event, data):
         """
         Checks whether given message is 'command'

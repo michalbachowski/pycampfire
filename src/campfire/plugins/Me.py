@@ -4,7 +4,7 @@
 ##
 # campfire.api
 from campfire.utils import Plugin
-
+from event import synchronous
 
 class Me(Plugin):
     """
@@ -18,7 +18,8 @@ class Me(Plugin):
         Returns information about event listeners mapping
         """
         return [('message.received', self.on_new_message)]
-    
+
+    @synchronous
     def on_new_message(self, event, data):
         """
         Handles new message
