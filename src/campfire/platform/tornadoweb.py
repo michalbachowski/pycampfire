@@ -118,8 +118,10 @@ class HttpHandler(BaseHandler):
         """
         Wait for new messages
         """
-        self.api.attach_poller(self.current_user, \
-            self._respond, self.get_argument("cursor", None))
+        cursor = self.get_argument("cursor", None)
+        if 'null' == cursor:
+            cursor = None
+        self.api.attach_poller(self.current_user, self._respond, cursor)
 
     def _respond(self, messages):
         """
