@@ -25,6 +25,12 @@ class Api(object):
     Main chat class
     """
 
+    user_struct = {'id': -1, 'name': 'Guest', 'ip': '127.0.0.1', \
+        'logged': False, 'hasAccount': False, 'system': False}
+
+    system_user_struct = {'id': -1, 'name': 'System', 'ip': '127.0.0.1', \
+        'logged': False, 'hasAccount': False, 'system': True}
+
     def __init__(self, log, dispatcher, cache_size=120):
         """
         Instance initialization
@@ -73,7 +79,8 @@ class Api(object):
         self.pollers = []
         for (callback, user) in pollers:
             self.log.debug('msg=closing connection; poller=%s', repr(callback))
-            self._respond([self._message('shutdown', {}, {})], callback)
+            self._respond([self._message('shutdown', self.system_user_struct, \
+                {})], callback)
             self.log.debug('msg=closed connection; poller=%s', repr(callback))
         self.log.debug('msg=closed remaining connections')
         self.log.info('msg=shutdown chat')

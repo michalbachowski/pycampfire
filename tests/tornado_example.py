@@ -70,6 +70,8 @@ class ChatServer(tornado.web.Application):
         api = campfire.Api(log, dispatcher)
         api.init()
 
+        auth.userStruct = api.user_struct
+
         args = {'log': log, 'api': api, 'auth': auth}
 
         # handlers and settings

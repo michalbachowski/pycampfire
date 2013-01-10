@@ -193,12 +193,7 @@ class AuthHelper(object):
     profiles = {} # list of profiles
     tokens = {}   # map token to profile
 
-    userStruct = {
-        'id': -1,
-        'name': 'Guest',
-        'logged': False,
-        'hasAccount': False
-    }
+    userStruct = None
 
     def login(self, user, ip):
         """
