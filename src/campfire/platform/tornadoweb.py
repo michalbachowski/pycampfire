@@ -251,7 +251,6 @@ class AuthHandler(BaseHandler):
         Login
         """
         user = self.get_argument("login")
-        response = Response()
         if not user:
             raise tornado.web.HTTPError(401, "Auth failed")
         # remember
@@ -260,6 +259,7 @@ class AuthHandler(BaseHandler):
         except RuntimeError:
             raise tornado.web.HTTPError(403, "Login used")
         # response
+        response = Response()
         response["auth"]  = "Logged In"
         response["profile"] = self.auth.get_current_user(cookie)
         self.set_secure_cookie(self.cookie_name, cookie, self.cookie_lifetime)
