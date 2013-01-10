@@ -236,13 +236,13 @@ class Api(object):
             pass
         return self
 
-    def _fetch_cached_messages(self, user, cursor=None):
+    def _fetch_cached_messages(self, user, cursor, callback_repr):
         """
         Fetches cached messages beginning from given cursor
         """
-        self.log.debug('msg=fetching cached messages; user=%s; cursor=%s', \
-            user, cursor)
-        tmp = map(lambda a: a is not None, [self._prepare_output(user, i) \
+        self.log.debug('msg=fetching cached messages; user=%s; cursor=%s; ' + \
+            'poller=%s', user, cursor, callback_repr)
+        tmp = map(lambda a: a is not None, [self._filter_output(user, i) \
             for i in takewhile(partial(self._compare_index, cursor), \
                 self._cache)])
         self.log.debug('msg=fetched cached messages; user=%s; cursor=%s; ' + \
