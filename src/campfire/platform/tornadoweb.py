@@ -194,11 +194,19 @@ class AuthHelper(object):
     tokens = {}   # map token to profile
 
     userStruct = None
+    session_time = 30 # minutes
 
     def login(self, user, ip):
         """
         Logs user in
         """
+        # logout old sessions
+        treshold = time.time() - self.session_time * 60
+        for (token, data) in self.tokens:
+            if data['lastvisit'] >= treshold:
+                continue
+            self.logout(token)
+
         if user in self.profiles:
             raise RuntimeError("Login used")
         # profile
