@@ -60,6 +60,7 @@ class ChatServer(tornado.web.Application):
         # prepare dispatcher and listeners (plugins)
         dispatcher = Dispatcher()
         plugins.Console().register(dispatcher)
+        plugins.Dice().register(dispatcher)
         plugins.Me().register(dispatcher)
         plugins.NoAuth().register(dispatcher)
         plugins.Whoami().register(dispatcher)
