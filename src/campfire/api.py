@@ -87,8 +87,9 @@ class Api(object):
             raise UninitializedChatError()
         # prepare message
         (msg, response) = self._prepare_message(message, user, args)
-        self._cache.appendleft(msg)
-        self._notify(msg)
+        if msg:
+            self._cache.appendleft(msg)
+            self._notify(msg)
         # prepare response to request
         return self._prepare_response(msg, response)
 

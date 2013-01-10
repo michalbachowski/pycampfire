@@ -124,11 +124,10 @@ class Console(Plugin):
         plugin = params.pop(0)
         action = params.pop(0)
         params.insert(0, data)
-        data['console'] = {'plugin': plugin, 'action': action}
 
         # check permissions
         if not self.check_permissions(plugin, action, data['from']):
-            return data
+            return None
 
         # call plugin
         try:
@@ -136,8 +135,7 @@ class Console(Plugin):
         except:
             self.log.exception('msg=exception while calling command; ' + \
                 'plugin=%s; action=%s; params=%s', plugin, action, params)
-        return data
-
+        return None
 
     def cmd_grant(self, msg, user, plugin=None, action=None):
         """
