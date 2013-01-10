@@ -8,12 +8,8 @@ class Plugin(Listener):
     Base abstract Plugin class
     """
     user_attrs = ['id', 'ip', 'name']
+    log = None
 
-    def __init__(self):
-        """
-        Object inizialization
-        """
-        self.log = None
 
     def match_user(self, user, possibilities):
         """
