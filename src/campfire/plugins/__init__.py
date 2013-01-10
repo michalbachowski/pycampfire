@@ -4,7 +4,9 @@ from Console import Console
 from Dice import Dice
 from Me import Me
 from NoAuth import NoAuth
+from Quotations import Quotations
 from Voices import Voices
 from Whoami import Whoami
 
-__all__ = ['Console', 'Dice', 'Me', 'NoAuth', 'Voices', 'Whoami']
+__all__ = ['Console', 'Dice', 'Me', 'NoAuth', 'Quotations', 'Voices', \
+    'Whoami']
