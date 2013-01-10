@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import uuid
-from itertools import takewhile
+from itertools import takewhile, imap
 from collections import deque
 from functools import partial
 from event import Event
@@ -48,6 +48,7 @@ class Api(object):
         self._cache = deque([], cache_size)
         self.pollers = []
         self._default_msg_num = 50
+        self._time_treshold = 15 # minutes after message will become unaccessible
 
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
 
@@ -252,25 +253,27 @@ class Api(object):
         """
         self.log.debug('msg=fetching cached messages; user=%s; cursor=%s; ' + \
             'poller=%s', user, cursor, callback_repr)
-        tmp = filter(lambda a: a is not None, \
-            (self._filter_output(user, i[1], callback_repr) \
-                for i in takewhile(partial(self._compare_index, cursor), \
-                    enumerate(self._cache)) if not self._is_current_item(\
-                        cursor, i[1])))
+        time_treshold = time.time() - self._time_treshold * 60
+        out = []
+        for (idx, msg) in enumerate(self._cache):
+            # cursor indicates current message - break
+            if cursor == msg['id']:
+                break
+            # cursor is None - check date or message index
+            elif cursor is None:
+                # we have too many messages
+                if idx >= self._default_msg_num:
+                    break
+                # message is too old
+                if msg['date'] < time_treshold:
+                    break
+            # prepare message
+            tmp = self._filter_output(user, msg, callback_repr)
+            # message returned is None - it can not be returned to user
+            if tmp is None:
+                continue
+            out.append(tmp)
         self.log.debug('msg=fetched cached messages; user=%s; cursor=%s; ' + \
-            'nummsg=%u', user, cursor, len(tmp))
-        return tmp
-
-    def _is_current_item(self, cursor, item):
-        """
-        Checks whether given cursor indicates given item
-        """
-        return cursor == item['id']
-
-    def _compare_index(self, cursor, item):
-        """
-        Compares cursor with index of given message
-        """
-        if cursor is None and item[0] < self._default_msg_num:
-            return True
-        return self._is_current_item(cursor, item[1])
+            'nummsg=%u', user, cursor, len(out))
+        out.reverse()
+        return out
