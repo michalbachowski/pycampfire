@@ -5,6 +5,7 @@ from itertools import takewhile
 from collections import deque
 from functools import partial
 from event import Event
+import time
 import copy
 
 
@@ -113,7 +114,7 @@ class Api(object):
         Prepares message object
         """
         return {'id': str(uuid.uuid4()), 'text': message, \
-            'from': user, 'args': args}
+            'from': user, 'args': args, 'date': int(time.time())}
 
     def _prepare_message(self, message, user, args):
         """
