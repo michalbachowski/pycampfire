@@ -23,6 +23,8 @@ class Me(Plugin):
         """
         Handles new message
         """
+        if data is None:
+            return data
         data['me'] = '/me ' == data['text'][:4]
         if data['me']:
             data['text'] = data['text'][4:]
