@@ -8,8 +8,9 @@ from Nap import Nap
 from NoAuth import NoAuth
 from Quotations import Quotations
 from Tidy import Tidy
+from Typing import Typing
 from Voices import Voices
 from Whoami import Whoami
 
 __all__ = ['Colors', 'Console', 'Dice', 'Me', 'Nap', 'NoAuth', 'Quotations', \
-    'Tidy', 'Voices', 'Whoami']
+    'Tidy', 'Typing', 'Voices', 'Whoami']
