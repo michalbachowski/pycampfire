@@ -14,27 +14,20 @@ class Voices(Plugin):
     Handles empty messages posted by some puppets and changes them
     """
 
-    def _init(self, event):
+    def __init__(self, voices):
         """
         Plugin initialization
         """
-        self.voices = {}
+        self.voices = voices
 
     def _mapping(self):
         """
         Returns information about event listeners mapping
         """
-        return [('voices.voice.add', self.add_voice), \
-            ('message.received', self.on_new_message, 70)] # BEFORE Quotations!
-
+        # BEFORE Quotations plugin!
+        return ('message.received', self.on_new_message, 70)]
+   
     @synchronous
-    def add_voice(self, event):
-        """
-        Adds new voice
-        """
-        self.voices[event['name']] = event['voice']
-        return True
-    
     def on_new_message(self, event, data):
         """
         Handles new message

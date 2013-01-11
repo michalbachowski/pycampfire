@@ -69,7 +69,7 @@ class ChatServer(tornado.web.Application):
         plugins.Quotations([]).register(dispatcher)
         plugins.Tidy().register(dispatcher)
         plugins.Typing().register(dispatcher)
-        plugins.Voices().register(dispatcher)
+        plugins.Voices({}).register(dispatcher)
         plugins.Whoami().register(dispatcher)
 
         # prepare auth handler
