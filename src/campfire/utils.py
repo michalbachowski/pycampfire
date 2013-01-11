@@ -17,7 +17,7 @@ class Plugin(Listener):
         given possibilities
         """
         return [v for (k, v) in user.iteritems() \
-            if k in Plugin.user_attrs and v in possibilities]
+            if k in Plugin.user_attrs and str(v) in possibilities]
 
 
     @synchronous
