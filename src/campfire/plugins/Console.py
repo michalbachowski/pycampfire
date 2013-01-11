@@ -42,6 +42,9 @@ class Console(Plugin):
             lambda p, a, u: True) # anyone can call that method
 
     def _reset(self):
+        """
+        Re-setting default variables for object
+        """
         self.commands = defaultdict(dict)
         self.permissions = defaultdict(dict)
         self.permission_checkers = defaultdict(dict)
