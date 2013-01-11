@@ -17,7 +17,7 @@ class Colors(Plugin):
         """
         Plugin initialization
         """
-        self.colors = dict(colors)
+        self.colors = colors
 
     def _init(self, event):
         """

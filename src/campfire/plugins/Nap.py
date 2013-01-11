@@ -20,7 +20,7 @@ class Nap(Plugin):
         """
         Plugin initialization
         """
-        self.quotes = list(quotes)
+        self.quotes = quotes
 
     def _mapping(self):
         """

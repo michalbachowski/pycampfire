@@ -21,7 +21,7 @@ class Quotations(Plugin):
         """
         Plugin object initialization
         """
-        self.quotations = list(quotations)
+        self.quotations = quotations
         self._selected_quotations = []
         self.preselect_size = 30
 
