@@ -202,7 +202,7 @@ class AuthHelper(object):
         """
         # logout old sessions
         treshold = time.time() - self.session_time * 60
-        for (token, data) in self.tokens:
+        for (token, data) in self.tokens.iteritems():
             if data['lastvisit'] >= treshold:
                 continue
             self.logout(token)
