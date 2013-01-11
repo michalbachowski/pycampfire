@@ -64,6 +64,8 @@ class Console(Plugin):
         Adds new command with proper permissions
         """
         plugin = event['plugin']
+        self.log.debug('msg=adding commands; plugin=%s; actions=%s', \
+            event['plugin'], event['actions'])
         for (action, data) in event['actions'].iteritems():
             # check for iterable
             try:
@@ -85,6 +87,9 @@ class Console(Plugin):
         action = action.lower()
         self.commands[plugin][action] = method
         self.permission_checkers[plugin][action] = checker or self.allow
+        self.log.debug('msg=attached command; plugin=%s; action=%s; ' + \
+            'method=%s; checker=%s', plugin, action, repr(method), \
+            repr(self.permission_checkers[plugin][action]))
 
     def check_permissions(self, plugin, action, user):
         """
