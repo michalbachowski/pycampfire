@@ -113,26 +113,6 @@ class ChatServer(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
 
 
-class CommentsHandler(tornado.web.RequestHandler):
-
-    def initialize(self):
-        self.log = logging.getLogger('')
-
-    @tornado.web.authenticated
-    def post(self, realm, item_type, item_id, ect):
-        status = 200
-        ret = int(JBComments.add(self.request.remote_ip,\
-            self.current_user['id'], self.get_argument('comment_text'),\
-            self.get_argument('nick', None), item_type, item_id, realm,))
-        if not ret:
-            status = 500
-        self.log.info('method: POST; status: %u; ip: %s, user: %u; cid: %u', \
-            status, self.request.remote_ip, self.current_user['id'], ret)
-        if not ret:
-            raise tornado.web.HTTPError(500)
-        self.write(json_encode({'comment_id': ret}))
-
-
 def main():
     parse_command_line()
 
