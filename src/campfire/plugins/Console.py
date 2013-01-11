@@ -46,11 +46,16 @@ class Console(Plugin):
         self.permissions = defaultdict(dict)
         self.permission_checkers = defaultdict(dict)
 
-    def _mapping(self):
+    def mapping(self):
         """
-        Returns information about event listeners mapping
+        Returns list of listeners to be attached to dispatcher.
+        [(event name, listener, priority), (event name, listener, priority)]
+
+        It is overriden on purpose (in order to set priority for 'chat.init')
         """
-        return [('console.command.add', self.add_command), \
+        return [('chat.init', self.init, 10), \
+            ('chat.shutdown', self.shutdown), \
+            ('console.command.add', self.add_command), \
             ('message.received', self.on_new_message, 10)]
 
     @synchronous
