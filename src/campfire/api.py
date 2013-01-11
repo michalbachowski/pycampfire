@@ -164,7 +164,7 @@ class Api(object):
             Event(self, 'message.read.prevent', {'user': user, \
                 'poller': poller, 'message': copy.deepcopy(message)}))
         self.log.debug('msg=checked whether message can be send to user; ' + \
-            'message=%s; user=%s; poller=%s; result=%s', message, user, poller, \
+            'message=%s; user=%s; poller=%s; result=%s', message, user, poller,\
             e.processed)
         if e.processed:
             return None
