@@ -25,7 +25,7 @@ class Voices(Plugin):
         Returns information about event listeners mapping
         """
         # BEFORE Quotations plugin!
-        return ('message.received', self.on_new_message, 70)]
+        return [('message.received', self.on_new_message, 70)]
    
     @synchronous
     def on_new_message(self, event, data):
