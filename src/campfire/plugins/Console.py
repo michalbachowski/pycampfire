@@ -60,15 +60,14 @@ class Console(Plugin):
         """
         plugin = event['plugin']
         for (action, data) in event['actions'].iteritems():
+            # check for iterable
             try:
-                # more often we will handle case: method => action
-                # rather than: method => (action, perms)
-                # so by default we try to unpack single value instead of topule
-                # (that single comma is crucial!)
-                method, = data
-            except ValueError:
+                iter(data)
+                # case: method => (action, perms)
                 method, permissions = data
-            else:
+            # case: method => action
+            except (TypeError, ValueError):
+                method = data
                 permissions = None
             self.attach_command(plugin, action, method, permissions)
         return True
