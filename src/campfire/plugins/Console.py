@@ -159,12 +159,14 @@ class Console(Plugin):
         except:
             self.log.exception('msg=exception while calling command; ' + \
                 'plugin=%s; action=%s; params=%s', plugin, action, params)
+            raise
         return None
 
     def cmd_grant(self, msg, user, plugin=None, action=None):
         """
         Grants user with permissions to given plugin and action
         """
+        # ensure that command exists
         try:
             self.commands[plugin][action]
         except KeyError:
@@ -172,12 +174,19 @@ class Console(Plugin):
                 "Plugin '%s' or action '%s' does not exist" % (plugin, action))
         else:
             self.permissions[plugin][action].append(user)
+            return 'Permissions granted'
 
     def cmd_revoke(self, msg, user, plugin=None, action=None):
         """
         Revokes permission to use given plugin and action by user
         """
-        pass
+        try:
+            self.permissions[plugin][action].remove(user)
+        except (KeyError, ValueError):
+            raise RuntimeError("Permission not revoked! " + \
+                "Plugin '%s' or action '%s' does not exist" % (plugin, action))
+        else:
+            return 'Permission revoked'
 
     def cmd_allowed(self, msg, plugin, action):
         """
