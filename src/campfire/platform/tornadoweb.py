@@ -66,6 +66,13 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         Handles error response
         """
+        return self.prepare_response(self._get_error_response(status_code, \
+            exception, kwargs))
+
+    def _get_error_response(self, status_code, exception=None, kwargs=None):
+        """
+        Prepares structure for error information
+        """
         response = Response()
         response.mark_failure()
         error = {
@@ -75,7 +82,7 @@ class BaseHandler(tornado.web.RequestHandler):
         if not exception is None:
             error['message'] = str(exception)
         response["error"] = error
-        return self.prepare_response(response)
+        return response
 
     def post_message(self, arguments):
         """
