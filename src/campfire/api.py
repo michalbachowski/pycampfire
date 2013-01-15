@@ -240,10 +240,7 @@ class Api(object):
             raise UninitializedChatError()
         self.log.debug('msg=detaching pollers for callback; poller=%s', \
             repr(callback))
-        try:
-            map(self._do_detach, (i for i in self.pollers if i[0] == callback))
-        except ValueError:
-            pass
+        map(self._do_detach, (i for i in self.pollers if i[0] == callback))
         return self
 
     def _fetch_cached_messages(self, user, cursor, callback_repr):
