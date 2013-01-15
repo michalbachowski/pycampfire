@@ -165,7 +165,13 @@ class Console(Plugin):
         """
         Grants user with permissions to given plugin and action
         """
-        pass
+        try:
+            self.commands[plugin][action]
+        except KeyError:
+            raise RuntimeError("Permission not granted! " + \
+                "Plugin '%s' or action '%s' does not exist" % (plugin, action))
+        else:
+            self.permissions[plugin][action].append(user)
 
     def cmd_revoke(self, msg, user, plugin=None, action=None):
         """
