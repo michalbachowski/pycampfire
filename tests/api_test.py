@@ -182,9 +182,9 @@ class ApiTestCase(unittest.TestCase):
         e2.return_value = None
         def side_effect2(a, b):
             e2.return_value = b
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect2).AndReturn(e2)
-        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
         
         self.mox.ReplayAll()
         self.api.init()
@@ -256,7 +256,7 @@ class ApiTestCase(unittest.TestCase):
 
     def test_poller_is_called_on_recv(self):
         # prepare
-        # called when message is received
+        # called when message is received (recv())
         e = self.mox.CreateMock(Event)
         e.processed = True
         e.return_value = None
@@ -272,9 +272,9 @@ class ApiTestCase(unittest.TestCase):
         e2.return_value = None
         def side_effect2(a, b):
             e2.return_value = b
+        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect2).AndReturn(e2)
-        self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
         # called when sending response to poller
         p = self.mox.CreateMockAnything()
         p(mox.IsA(list))
@@ -286,7 +286,6 @@ class ApiTestCase(unittest.TestCase):
             e1.return_value = b
         self.listeners.filter(mox.IsA(Event), mox.IsA(dict)).WithSideEffects(\
             side_effect1).AndReturn(e1)
-        
         self.mox.ReplayAll()
         self.api.init()
 
@@ -329,13 +328,13 @@ class ApiTestCase(unittest.TestCase):
             e2.return_value = None
         
             # called when sending response to poller
+            self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
             self.listeners.filter(mox.IsA(Event), mox.IsA(dict)\
                 ).WithSideEffects(partial(side_effect1, e2)).AndReturn(e2)
-            self.listeners.notify_until(mox.IsA(Event)).AndReturn(e2)
             
             p = self.mox.CreateMockAnything()
-            p([{'tmp': i, 'text': 'a', 'args': 'c', 'from': 'b', \
-                'id': mox.IsA(str)}])
+            p([{'tmp': i, 'text': 'a', 'args': 'c', 'date': mox.IsA(int), \
+                'from': 'b', 'id': mox.IsA(str)}])
             pollers.append(p)
         # called when preparing response to request
         e1 = self.mox.CreateMock(Event)
