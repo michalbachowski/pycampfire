@@ -95,8 +95,12 @@ class BaseHandler(tornado.web.RequestHandler):
                 continue
             auxArgs[arg] = arguments.get(arg, None)
         # write message
-        return self.api.recv(arguments['message'][0], self.current_user, \
-            auxArgs)
+        try:
+            return self.api.recv(arguments['message'][0], self.current_user, \
+                auxArgs)
+        except RuntimeError, e:
+            self.set_status(500)
+            return self._get_error_response(500, e)
 
     def get_current_user(self):
         """
