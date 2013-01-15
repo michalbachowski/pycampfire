@@ -47,7 +47,6 @@ class Api(object):
         self._initialized = False
         self._cache = deque([], cache_size)
         self.pollers = []
-        self._default_msg_num = 50
         self._time_treshold = 15 # minutes after message will become unaccessible
 
         self.log.debug('msg=init new api instance; cache_size=%u', cache_size)
@@ -261,9 +260,6 @@ class Api(object):
                 break
             # cursor is None - check date or message index
             elif cursor is None:
-                # we have too many messages
-                if idx >= self._default_msg_num:
-                    break
                 # message is too old
                 if msg['date'] < time_treshold:
                     break
