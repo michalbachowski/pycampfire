@@ -66,6 +66,7 @@ class ChatServer(tornado.web.Application):
         plugins.Me().register(dispatcher)
         plugins.Nap(['sleeps', 'is snoring']).register(dispatcher)
         plugins.NoAuth().register(dispatcher)
+        plugins.Puppet({}).register(dispatcher)
         plugins.Quotations([]).register(dispatcher)
         plugins.Tidy().register(dispatcher)
         plugins.Typing().register(dispatcher)
