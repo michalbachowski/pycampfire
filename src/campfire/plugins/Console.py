@@ -5,6 +5,7 @@
 # python stdlib
 import csv
 import inspect
+from functools import partial
 from collections import defaultdict
 
 ##
@@ -46,7 +47,7 @@ class Console(Plugin):
         Re-setting default variables for object
         """
         self.commands = defaultdict(dict)
-        self.permissions = defaultdict(dict)
+        self.permissions = defaultdict(partial(defaultdict, list))
         self.permission_checkers = defaultdict(dict)
 
     def mapping(self):
