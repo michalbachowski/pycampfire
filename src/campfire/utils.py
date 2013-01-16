@@ -19,6 +19,19 @@ class Plugin(Listener):
         return [v for (k, v) in user.iteritems() \
             if k in Plugin.user_attrs and str(v) in possibilities]
 
+    def get_uid(self, user):
+        """
+        Fetches user ID for given user
+        """
+        if user is None:
+            return None
+        if user['hasAccount']:
+            return user['id']
+        if user['logged']:
+            return user['name']
+        if 'ip' in user:
+            return user['ip']
+        return None
 
     @synchronous
     def init(self, event):
