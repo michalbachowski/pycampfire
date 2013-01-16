@@ -90,14 +90,17 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         # prepare auxyliary arguments
         auxArgs = {}
+        message = None
         for arg in arguments:
             if "message" == arg:
+                message = arguments.get(arg, [''])[0]
                 continue
             auxArgs[arg] = arguments.get(arg, None)
+        if not message:
+            raise tornado.web.HTTPError(400)
         # write message
         try:
-            return self.api.recv(arguments['message'][0], self.current_user, \
-                auxArgs)
+            return self.api.recv(message, self.current_user, auxArgs)
         except RuntimeError, e:
             self.set_status(500)
             return self._get_error_response(500, e)
