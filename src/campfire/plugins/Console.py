@@ -20,18 +20,14 @@ class Console(Plugin):
     Simplifies managing console-like commands
     """
 
-    def __init__(self):
-        """
-        Object initialziation
-        """
-        self._reset()
-
     def _init(self, event):
         """
         Initializes plugin
         """
         # initialize some variables
-        self._reset()
+        self.commands = defaultdict(dict)
+        self.permissions = defaultdict(partial(defaultdict, list))
+        self.permission_checkers = defaultdict(dict)
 
         # attach commands
         plugin = self.__class__.__name__
@@ -41,14 +37,6 @@ class Console(Plugin):
         self.attach_command(plugin, 'list_perms', self.cmd_list_perms)
         self.attach_command(plugin, 'allowed', self.cmd_allowed, \
             lambda p, a, u: True) # anyone can call that method
-
-    def _reset(self):
-        """
-        Re-setting default variables for object
-        """
-        self.commands = defaultdict(dict)
-        self.permissions = defaultdict(partial(defaultdict, list))
-        self.permission_checkers = defaultdict(dict)
 
     def mapping(self):
         """
