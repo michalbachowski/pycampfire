@@ -79,6 +79,7 @@ class ChatServer(tornado.web.Application):
         plugins.AntiFlood().register(dispatcher)
         plugins.Archive(os.path.abspath('./archive.%Y%m%d.csv'), \
             archive_formatter).register(dispatcher)
+        plugins.Ban({}).register(dispatcher)
         plugins.Colors({}).register(dispatcher)
         plugins.Console().register(dispatcher)
         plugins.Dice().register(dispatcher)
