@@ -98,7 +98,8 @@ class Console(Plugin):
         Default permission checker
         """
         try:
-            return self.match_user(user, self.permissions[plugin][action])
+            return len(self.match_user(user, \
+                self.permissions[plugin][action])) > 0
         except ValueError:
             return False 
 
