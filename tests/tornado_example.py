@@ -59,6 +59,7 @@ class ChatServer(tornado.web.Application):
 
         # prepare dispatcher and listeners (plugins)
         dispatcher = Dispatcher()
+        plugins.AntiFlood().register(dispatcher)
         plugins.Colors({}).register(dispatcher)
         plugins.Console().register(dispatcher)
         plugins.Dice().register(dispatcher)
