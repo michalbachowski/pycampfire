@@ -20,6 +20,7 @@ import logging
 import os
 import sys
 import signal
+import time
 
 # hack for loading modules
 import _path
@@ -47,6 +48,22 @@ define('port', default=21777, help="run on the given port", type=int)
 define('debug', default=False, help="run in debug mode", type=bool)
 define('f', default=False, help="fix Python PATH", type=bool)
 
+def archive_formatter(data):
+    if 'typing' in data and data['typing']:
+        return None
+    to = 'public'
+    if 'to' in data:
+        to = data['to']
+    return [
+        time.strftime(
+            '%Y-%m-%d %H:%M:%S',
+            time.gmtime(data['date'])
+        ),
+        data['from']['ip'],
+        data['from']['name'],
+        to,
+        data['text']
+    ]
 
 class ChatServer(tornado.web.Application):
     """
@@ -60,6 +77,8 @@ class ChatServer(tornado.web.Application):
         # prepare dispatcher and listeners (plugins)
         dispatcher = Dispatcher()
         plugins.AntiFlood().register(dispatcher)
+        plugins.Archive(os.path.abspath('./archive.%Y%m%d.csv'), \
+            archive_formatter).register(dispatcher)
         plugins.Colors({}).register(dispatcher)
         plugins.Console().register(dispatcher)
         plugins.Dice().register(dispatcher)
