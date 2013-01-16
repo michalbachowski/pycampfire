@@ -90,13 +90,15 @@ class Api(object):
         """
         Entry point for new massages
         """
-        self.log.info('msg=received message; message=%s; user=%s; args=%s', \
+        self.log.debug('msg=received message; message=%s; user=%s; args=%s', \
             message, user, args)
         if not self._initialized:
             raise UninitializedChatError()
         # prepare message
         (msg, response) = self._prepare_message(message, user, args)
         if msg:
+            self.log.info('msg=stored message; message=%s; user=%s; args=%s', \
+                msg, user, args)
             self._cache.appendleft(msg)
             self._notify(msg)
         # prepare response to request
