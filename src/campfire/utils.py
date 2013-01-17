@@ -114,6 +114,7 @@ class AuthHelper(object):
         """
         self.cleanup()
 
+    @property
     def session_max_age(self):
         """
         Calculates max lastvisit time that makes session valid
