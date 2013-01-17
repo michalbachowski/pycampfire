@@ -14,9 +14,10 @@ from Puppet import Puppet
 from Quotations import Quotations
 from Tidy import Tidy
 from Typing import Typing
+from ValidateLogin import ValidateLogin
 from Voices import Voices
 from Whoami import Whoami
 
 __all__ = ['AntiFlood', 'Archive', 'Ban', 'Colors', 'Console', 'Dice', \
     'Direct', 'Me', 'Nap', 'NoAuth', 'Puppet', 'Quotations', 'Tidy', 'Typing', \
-    'Voices', 'Whoami']
+    'ValidateLogin', 'Voices', 'Whoami']
