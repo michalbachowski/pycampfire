@@ -25,11 +25,6 @@ import tornado.websocket
 from tornado.escape import json_encode, json_decode
 
 import os.path
-import copy
-import uuid
-import time
-import functools
-import logging
 
 
 class Response(dict):
