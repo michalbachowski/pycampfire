@@ -52,6 +52,7 @@ class BaseHandler(tornado.web.RequestHandler):
         """
         Prepares instance
         """
+        self.log = log
         self.api = api
         self.auth = auth
         self.cookie_name = 'chat_user'
