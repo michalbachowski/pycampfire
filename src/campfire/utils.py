@@ -147,7 +147,7 @@ class AuthHelper(object):
             {'login': user}))
 
         if e.processed:
-            raise RuntimeError("Login rejected")
+            raise RuntimeError(e.return_value or "Login rejected")
 
         # create profile
         profile = copy.deepcopy(self.user_struct)
