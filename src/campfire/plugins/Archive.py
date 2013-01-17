@@ -12,6 +12,7 @@ import copy
 from campfire.utils import Plugin
 from event import synchronous
 
+
 class Archive(Plugin):
     """
     Archive plugin.
@@ -37,7 +38,15 @@ class Archive(Plugin):
         """
         Returns information about event listeners mapping
         """
-        return [('message.received', self.on_new_message, 10000)]
+        return [('message.received', self.on_new_message, 10000), \
+            ('chat.periodic', self.periodic)]
+
+    @synchronous
+    def periodic(self, event):
+        """
+        Handles periodic event
+        """
+        self.write()
 
     def _shutdown(self, event):
         """
