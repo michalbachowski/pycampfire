@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+##
+# python stdlib
+import copy
+import uuid
+import time
+
+##
+# event module
 from event import Event, Listener, synchronous
 
 
