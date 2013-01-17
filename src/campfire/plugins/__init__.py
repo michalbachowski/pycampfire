@@ -4,6 +4,7 @@ from AntiFlood import AntiFlood
 from Archive import Archive
 from Ban import Ban
 from Colors import Colors
+from Config import Config
 from Console import Console
 from Dice import Dice
 from Direct import Direct
@@ -18,6 +19,6 @@ from ValidateLogin import ValidateLogin
 from Voices import Voices
 from Whoami import Whoami
 
-__all__ = ['AntiFlood', 'Archive', 'Ban', 'Colors', 'Console', 'Dice', \
-    'Direct', 'Me', 'Nap', 'NoAuth', 'Puppet', 'Quotations', 'Tidy', 'Typing', \
-    'ValidateLogin', 'Voices', 'Whoami']
+__all__ = ['AntiFlood', 'Archive', 'Ban', 'Colors', 'Config', 'Console', \
+    'Dice', 'Direct', 'Me', 'Nap', 'NoAuth', 'Puppet', 'Quotations', 'Tidy', \
+    'Typing', 'ValidateLogin', 'Voices', 'Whoami']

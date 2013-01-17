@@ -75,25 +75,29 @@ class ChatServer(tornado.web.Application):
         if options.debug:
             log.setLevel(logging.DEBUG)
 
+        # prepare config manager
+        config = plugins.Config(os.path.abspath('./config.cfg'))
+
         # prepare dispatcher and listeners (plugins)
         dispatcher = Dispatcher()
         plugins.AntiFlood().register(dispatcher)
         plugins.Archive(os.path.abspath('./archive.%Y%m%d.csv'), \
             archive_formatter).register(dispatcher)
-        plugins.Ban({}).register(dispatcher)
-        plugins.Colors({}).register(dispatcher)
+        plugins.Ban(config.get('ban', {})).register(dispatcher)
+        plugins.Colors(config.get('colors', {})).register(dispatcher)
         plugins.Console().register(dispatcher)
+        config.register(dispatcher)
         plugins.Dice().register(dispatcher)
         plugins.Direct().register(dispatcher)
         plugins.Me().register(dispatcher)
-        plugins.Nap(['sleeps', 'is snoring']).register(dispatcher)
+        plugins.Nap(config.get('nap', [])).register(dispatcher)
         plugins.NoAuth().register(dispatcher)
-        plugins.Puppet({}).register(dispatcher)
-        plugins.Quotations([]).register(dispatcher)
+        plugins.Puppet(config.get('puppet', {})).register(dispatcher)
+        plugins.Quotations(config.get('quotations', [])).register(dispatcher)
         plugins.Tidy().register(dispatcher)
         plugins.Typing().register(dispatcher)
-        plugins.ValidateLogin([]).register(dispatcher)
-        plugins.Voices({}).register(dispatcher)
+        plugins.ValidateLogin(config.get('stopwords', [])).register(dispatcher)
+        plugins.Voices(config.get('voices', {})).register(dispatcher)
         plugins.Whoami().register(dispatcher)
 
         # prepare API instance and run chat
