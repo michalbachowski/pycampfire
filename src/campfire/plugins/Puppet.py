@@ -24,7 +24,7 @@ class Puppet(Plugin):
         Returns information about event listeners mapping
         """
         return [('message.received', self.on_new_message), \
-            ('auth.nick.check', self.on_login)]
+            ('auth.login.reject', self.reject_login)]
 
     def _init(self, event):
         """
@@ -36,15 +36,16 @@ class Puppet(Plugin):
             'get': (self.cmd_get, self.permissions_get)}}))
 
     @synchronous
-    def on_login(self, event):
+    def reject_login(self, event):
         """
         Prevents guest from using Puppet names as nicknames
         """
         for v in self.puppets.itervalues():
             # compare puppet name with nick
-            if event['nick'] == v[0]:
-                return False
-        return True
+            if event['login'] == v[0]:
+                event.return_value = 'Login can not be same as Puppet name'
+                return True
+        return False
 
     @synchronous
     def on_new_message(self, event, data):
