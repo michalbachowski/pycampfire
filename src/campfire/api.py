@@ -86,6 +86,13 @@ class Api(object):
         self.log.info('msg=shutdown chat')
         return self
 
+    def periodic_notification(self):
+        """
+        Sends periodic notifications to plugins
+        """
+        self.log.debug('msg=periodic notification')
+        self.dispatcher.notify(Event(self, 'chat.periodic'))
+
     def recv(self, message, user, args):
         """
         Entry point for new massages
