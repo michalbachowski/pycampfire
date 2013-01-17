@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from event import Listener, synchronous
+from event import Event, Listener, synchronous
 
 
 class Plugin(Listener):
@@ -78,3 +78,109 @@ class Plugin(Listener):
         [(event name, listener, priority), (event name, listener, priority)]
         """
         return []
+
+
+class AuthHelper(object):
+    """
+    Helper that provides basic auth mechanism
+    """
+    profiles = {} # list of profiles
+    tokens = {}   # map token to profile
+
+    session_time = 30 # minutes
+
+    def __init__(self, api, dispatcher):
+        """
+        Object initializtion
+        """
+        self.user_struct = api.user_struct
+        self.dispatcher = dispatcher
+        dispatcher.attach('chat.periodic', self.periodic)
+
+    @synchronous
+    def periodic(self, event):
+        """
+        Handles periodic events
+        """
+        self.cleanup()
+
+    def session_max_age(self):
+        """
+        Calculates max lastvisit time that makes session valid
+        """
+        return time.time() - self.session_time * 60
+
+    def cleanup(self):
+        """
+        Method cleans up old session
+        """
+        treshold = self.session_max_age
+        tokens = self.tokens.copy()
+        for (token, data) in tokens.iteritems():
+            if data['lastvisit'] >= treshold:
+                continue
+            self.logout(token)
+
+    def login(self, user, ip):
+        """
+        Logs user in
+        """
+        self.cleanup()
+
+        # login has been used already
+        if user in self.profiles:
+            raise RuntimeError("Login used")
+
+        # check whether login is allowed
+        e = self.dispatcher.notify_until(Event(self, 'auth.login.reject', \
+            {'login': name}))
+
+        if e.processed:
+            raise RuntimeError("Login rejected")
+
+        # create profile
+        profile = copy.deepcopy(self.user_struct)
+        profile.update({'name': user, 'logged': True, \
+            'ip': ip})
+
+        # prepare profile information
+        e = self.dispatcher.filter(Event(self, 'auth.profile.prepare'), profile)
+        if e.return_value is None:
+            raise RuntimeError("Login terminated")
+        profile = e.return_value
+
+        # create token
+        token = str(uuid.uuid4())
+        self.profiles[user] = profile
+        self.tokens[token] = {'user': user, 'lastvisit': time.time()}
+
+        # notify plugin that user has been logged in
+        e = self.dispatcher.notify(Event(self, 'auth.logged.in', \
+            {'profile': profile, 'token': token}))
+        return token
+
+    def logout(self, token):
+        """
+        Logs user out
+        """
+        # notify plugin that user has been logged out
+        e = self.dispatcher.notify(Event(self, 'auth.logged.out', \
+            {'profile': self.profiles[self.tokens[token]['user']], \
+            'token': token}))
+        del self.profiles[self.tokens[token]['user']]
+        del self.tokens[token]
+
+    def get_current_user(self, token):
+        """
+        Fetches current user profile
+        """
+        # bump lastvisit time
+        try:
+            if self.tokens[token]['lastvisit'] <= self.session_max_age:
+                return None
+            self.tokens[token]['lastvisit'] = time.time()
+            return self.profiles[self.tokens[token]['user']]
+        except KeyError:
+            if token in self.tokens:
+                del self.tokens[token]
+            return None

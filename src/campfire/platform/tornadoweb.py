@@ -203,57 +203,6 @@ class SocketHandler(BaseHandler, tornado.websocket.WebSocketHandler):
         self.attach_poller()
 
 
-class AuthHelper(object):
-    profiles = {} # list of profiles
-    tokens = {}   # map token to profile
-
-    userStruct = None
-    session_time = 30 # minutes
-
-    def login(self, user, ip):
-        """
-        Logs user in
-        """
-        # logout old sessions
-        treshold = time.time() - self.session_time * 60
-        for (token, data) in self.tokens.iteritems():
-            if data['lastvisit'] >= treshold:
-                continue
-            self.logout(token)
-
-        if user in self.profiles:
-            raise RuntimeError("Login used")
-        # profile
-        profile = copy.deepcopy(self.userStruct)
-        profile.update({'name': user, 'logged': True, \
-            'ip': ip})
-        # cookie
-        token = str(uuid.uuid4())
-        self.profiles[user] = profile
-        self.tokens[token] = {'user': user, 'lastvisit': time.time()}
-        return token
-
-    def logout(self, token):
-        """
-        Logs user out
-        """
-        del self.profiles[self.tokens[token]['user']]
-        del self.tokens[token]
-
-    def get_current_user(self, token):
-        """
-        Fetches current user profile
-        """
-        # bump lastvisit time
-        try:
-            self.tokens[token]['lastvisit'] = time.time()
-            return self.profiles[self.tokens[token]['user']]
-        except KeyError:
-            if token in self.tokens:
-                del self.tokens[token]
-            return None
-
-
 class AuthHandler(BaseHandler):
     """
     Chat authentication handler
@@ -299,5 +248,3 @@ class AuthHandler(BaseHandler):
         response = Response()
         response["auth"] = "You are now logged out"
         self.finish(self.prepare_response(response))
-
-    # TODO: periodic callback to logout users

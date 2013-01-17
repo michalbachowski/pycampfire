@@ -39,6 +39,7 @@ from tornado.escape import json_encode
 import campfire
 import campfire.platform.tornadoweb as chat
 import campfire.plugins as plugins
+from campfire.utils import AuthHelper
 
 # EventDispatcher modules
 from event import Dispatcher
@@ -94,14 +95,12 @@ class ChatServer(tornado.web.Application):
         plugins.Voices({}).register(dispatcher)
         plugins.Whoami().register(dispatcher)
 
-        # prepare auth handler
-        auth = chat.AuthHelper()
-
         # prepare API instance and run chat
         api = campfire.Api(log, dispatcher)
         api.init()
 
-        auth.userStruct = api.user_struct
+        # prepare auth handler
+        auth = AuthHelper(api, dispatcher)
 
         args = {'log': log, 'api': api, 'auth': auth}
 
