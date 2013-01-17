@@ -28,3 +28,4 @@ pip-log.txt
 
 # other
 tests/archive.*
+tests/config.cfg
