@@ -144,7 +144,7 @@ class AuthHelper(object):
 
         # check whether login is allowed
         e = self.dispatcher.notify_until(Event(self, 'auth.login.reject', \
-            {'login': name}))
+            {'login': user}))
 
         if e.processed:
             raise RuntimeError("Login rejected")
