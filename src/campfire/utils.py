@@ -89,10 +89,11 @@ class AuthHelper(object):
 
     session_time = 30 # minutes
 
-    def __init__(self, api, dispatcher):
+    def __init__(self, api, dispatcher, log):
         """
         Object initializtion
         """
+        self.log = log
         self.user_struct = api.user_struct
         self.dispatcher = dispatcher
         dispatcher.attach('chat.periodic', self.periodic)
@@ -156,7 +157,9 @@ class AuthHelper(object):
 
         # notify plugin that user has been logged in
         e = self.dispatcher.notify(Event(self, 'auth.logged.in', \
-            {'profile': profile, 'token': token}))
+            {'profile': copy.deepcopy(profile), 'token': token}))
+        self.log.debug('msg=user logged in; login=%s; profile=%s', user, \
+            profile)
         return token
 
     def logout(self, token):

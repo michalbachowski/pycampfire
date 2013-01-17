@@ -100,7 +100,7 @@ class ChatServer(tornado.web.Application):
         api.init()
 
         # prepare auth handler
-        auth = AuthHelper(api, dispatcher)
+        auth = AuthHelper(api, dispatcher, log)
 
         args = {'log': log, 'api': api, 'auth': auth}
 
