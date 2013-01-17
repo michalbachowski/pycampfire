@@ -133,6 +133,11 @@ class ChatServer(tornado.web.Application):
         if options.debug:
             add_reload_hook(api.shutdown)
 
+        # periodic callback
+        p = tornado.ioloop.PeriodicCallback(api.periodic_notification, \
+            1 * 60 * 1000) # 1 minute
+        p.start()
+
         # start app
         tornado.web.Application.__init__(self, handlers, **settings)
 
