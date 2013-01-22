@@ -1,9 +1,9 @@
-[submodule "vendors/pyevent"]
-	path = vendors/pyevent
-	url = git://github.com/michalbachowski/pyevent.git
 [submodule "vendors/js-campfire"]
 	path = vendors/js-campfire
 	url = git://github.com/michalbachowski/js-campfire.git
 [submodule "vendors/tornado"]
 	path = vendors/tornado
 	url = git://github.com/facebook/tornado.git
+[submodule "vendors/pyevent"]
+	path = vendors/pyevent
+	url = git://github.com/michalbachowski/pyevent.git
