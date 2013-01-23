@@ -56,7 +56,7 @@ class Config(Plugin):
                         # list
                         self.storage[k].extend(tmp[k])
         except IOError, e:
-            self.log.info('msg=config not loaded; path=%s; error=%s', \
+            self.log.info('msg=configuration not loaded; path=%s; error=%s', \
                 self.path, e.strerror)
 
     def _shutdown(self, event):
@@ -84,7 +84,7 @@ class Config(Plugin):
         """
         with open(self.path, "w+") as f:
             json.dump(self.storage, f)
-        self.log.info('msg=config has been written; path=%s', self.path)
+        self.log.info('msg=configuration has been written; path=%s', self.path)
 
     def get(self, plugin, default):
         """
