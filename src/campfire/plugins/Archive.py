@@ -38,7 +38,7 @@ class Archive(Plugin):
         """
         Returns information about event listeners mapping
         """
-        return [('message.received', self.on_new_message, 10000), \
+        return [('message.received', self.on_new_message, 1337), \
             ('chat.periodic', self.periodic)]
 
     @synchronous
