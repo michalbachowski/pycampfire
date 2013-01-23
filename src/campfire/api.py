@@ -105,9 +105,13 @@ class Api(object):
         (msg, response) = self._prepare_message(message, user, args)
         if msg:
             self.log.info('msg=stored message; message=%s; user=%s; args=%s', \
-                msg, user, args)
+                msg['id'], user, args)
             self._cache.appendleft(msg)
             self._notify(msg)
+        else:
+            msg = {'id': None}
+            self.log.debug('msg=message NOT stored; message=%s; user=%s; ' + \
+                'args=%s', msg['id'], user, args)
         # prepare response to request
         return self._prepare_response(msg, response)
 
@@ -115,7 +119,6 @@ class Api(object):
         """
         Checks authentication for given user
         """
-        self.log.debug('msg=authenticating user; user=%s', user)
         e = self.dispatcher.notify_until(Event(self, 'auth.check', user))
         if not e.processed:
             self.log.warning('msg=error while authenticating user; user=%s', \
@@ -136,28 +139,21 @@ class Api(object):
         """
         Prepares message data
         """
-        self.log.debug('msg=preparing message; message=%s; user=%s; args=%s', \
-            message, user, args)
         # filter message and prepare final message structure
         e = self.dispatcher.filter(Event(self, 'message.received', \
             {'response': {}}), self._message(message, self._auth_user(user), \
             args))
         response = e['response']
-        self.log.debug('msg=message prepared; message=%s; user=%s; ' + \
-            'args=%s; result=%s; response=%s;', message, user, args, \
-            e.return_value, response)
         return (e.return_value, response)
     
     def _prepare_response(self, message, response):
         """
         Prepares response to Api.recv() request
         """
-        self.log.debug('msg=prepare response to "recv()" request; ' + \
-            'message=%s; response=%s', message, response)
         e = self.dispatcher.filter(Event(self, 'message.request.response', \
             {'message': message}), response)
         self.log.debug('msg=prepared response to "recv()" request; ' + \
-            'message=%s; result=%s', message, e.return_value)
+            'message=%s; result=%s', message['id'], e.return_value)
         return e.return_value
 
     def _filter_output(self, user, message, poller):
@@ -166,32 +162,24 @@ class Api(object):
         """
         # prevent from returning message to user,
         # that should not read it
-        self.log.debug('msg=checking whether message can be send to user; ' + \
-            'message=%s; user=%s; poller=%s', message, user, poller)
         e = self.dispatcher.notify_until(\
             Event(self, 'message.read.prevent', {'user': user, \
                 'poller': poller, 'message': copy.deepcopy(message)}))
-        self.log.debug('msg=checked whether message can be send to user; ' + \
-            'message=%s; user=%s; poller=%s; result=%s', message, user, poller,\
-            e.processed)
         if e.processed:
+            self.log.debug('msg=message can not be send to user, skipping; ' + \
+            'message=%s; user=%s; poller=%s; result=%s', message['id'], user, \
+            poller, e.processed)
             return None
         # filter message
-        self.log.debug('msg=filter output message; message=%s; user=%s; ' + \
-            'poller=%s', message, user, poller)
         msg = self.dispatcher.filter(\
             Event(self, 'message.read.filter', {'user': user, \
                 'poller': poller}), copy.deepcopy(message)).return_value
-        self.log.debug('msg=filtered output message; message=%s; user=%s; ' + \
-            'poller=%s; result=%s', message, user, poller, msg)
         return msg
 
     def _notify(self, message):
         """
         Sends response to all pollers
         """
-        self.log.debug('msg=sending new message to pollers; ' + \
-            'message=%s', message)
         pollers = copy.copy(self.pollers)
         self.pollers = []
         for (callback, user) in pollers:
@@ -203,8 +191,8 @@ class Api(object):
                 self.pollers.append((callback, user))
             # send message
             else:
-                self.log.debug('msg=sending message to poller; ' + \
-                    'user=%s; poller=%s', user, repr(callback))
+                self.log.debug('msg=sending message to poller; user=%s; ' + \
+                    'poller=%s; message=%s', user, repr(callback), tmp['id'])
                 self._respond([tmp], callback)
 
     def _respond(self, message, callback):
@@ -228,7 +216,7 @@ class Api(object):
                 repr(callback), len(tmp))
             self._respond(tmp, callback)
             return
-        self.log.debug('msg=attaching new poller; ' + \
+        self.log.debug('msg=new messages not found, attaching new poller; ' + \
             'user=%s; poller=%s', user, repr(callback))
         self.pollers.append((callback, user))
         return self
@@ -247,8 +235,6 @@ class Api(object):
         """
         if not self._initialized:
             raise UninitializedChatError()
-        self.log.debug('msg=detaching pollers for callback; poller=%s', \
-            repr(callback))
         map(self._do_detach, (i for i in self.pollers if i[0] == callback))
         return self
 
@@ -256,8 +242,6 @@ class Api(object):
         """
         Fetches cached messages beginning from given cursor
         """
-        self.log.debug('msg=fetching cached messages; user=%s; cursor=%s; ' + \
-            'poller=%s', user, cursor, callback_repr)
         time_treshold = time.time() - self._time_treshold * 60
         out = []
         for (idx, msg) in enumerate(self._cache):
@@ -275,7 +259,5 @@ class Api(object):
             if tmp is None:
                 continue
             out.append(tmp)
-        self.log.debug('msg=fetched cached messages; user=%s; cursor=%s; ' + \
-            'nummsg=%u', user, cursor, len(out))
         out.reverse()
         return out

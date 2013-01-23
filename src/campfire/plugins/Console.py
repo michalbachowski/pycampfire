@@ -56,8 +56,6 @@ class Console(Plugin):
         Adds new command with proper permissions
         """
         plugin = event['plugin']
-        self.log.debug('msg=adding commands; plugin=%s; actions=%s', \
-            event['plugin'], event['actions'])
         for (action, data) in event['actions'].iteritems():
             # check for iterable
             try:
