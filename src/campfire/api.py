@@ -144,6 +144,8 @@ class Api(object):
             {'response': {}}), self._message(message, self._auth_user(user), \
             args))
         response = e['response']
+        self.dispatcher.notify(Event(self, 'message.prepared', \
+            {'message': copy.deepcopy(e.return_value)}))
         return (e.return_value, response)
     
     def _prepare_response(self, message, response):
