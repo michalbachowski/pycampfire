@@ -1,5 +1,5 @@
 [run]
 branch = True
 omit =
-    */event.py/*
+    */pyevent/*
     */tests/*
