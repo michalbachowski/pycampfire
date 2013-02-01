@@ -8,7 +8,7 @@ import unittest
 import _path
 _path.fix()
 
-TEST_MODULES = ['api_test']
+TEST_MODULES = ['api_test', 'plugins.Me_test']
 
 
 def all():
